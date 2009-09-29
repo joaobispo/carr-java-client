@@ -15,14 +15,34 @@
  *  under the License.
  */
 
-package pt.ualg.carr.client1;
+package pt.ualg.carr.gui;
+
+import java.awt.EventQueue;
 
 /**
- * Listed to incomming Command objects.
+ * Starts the Gui. Construts the JFrame and the Model in another thread
+ * and returns a reference to the model.
  *
  * @author Joao Bispo
  */
-public interface CommandListener {
+public class GuiLauncher implements Runnable {
 
-   public void processCommand(Command command);
+   @Override
+   public void run() {
+      mainWindow = new MainWindow();
+      mainWindow.setVisible(true);
+   }
+
+   /**
+    * Invokes the AWT EventQueue to start a new MainWindow frame.
+    * @return
+    */
+   public static MainWindow startMainWindow() {
+      GuiLauncher launcher = new GuiLauncher();
+      EventQueue.invokeLater(launcher);
+      return launcher.mainWindow;
+   }
+   
+   // INSTANCE VARIABLES
+   private MainWindow mainWindow;
 }

@@ -23,6 +23,7 @@
 
 package pt.ualg.carr.gui;
 
+import javax.swing.JFrame;
 import pt.ualg.carr.client1.Command;
 import pt.ualg.carr.client1.CommandListener;
 
@@ -159,13 +160,35 @@ public class MainWindow extends javax.swing.JFrame implements CommandListener {
     /**
     * @param args the command line arguments
     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainWindow().setVisible(true);
-            }
-        });
+
+    /*
+    public static JFrame createFrame() {
+       JFrame mainWindow = new MainWindow();
     }
+     */
+
+    /*
+    public static JFrame startGui() {
+       // Anonymous Class
+       Runnable windowRunnable = new Runnable() {
+         @Override
+            public void run() {
+                mainWindow = new MainWindow();
+                mainWindow.setVisible(true);
+            }
+
+         public JFrame getMainWindow() {
+            return mainWindow;
+         }
+
+         // INSTANCE VARIABLES
+         public JFrame mainWindow;
+        };
+
+        java.awt.EventQueue.invokeLater(windowRunnable);
+        return windowRunnable.mainWindow;
+    }
+     */
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JLabel jLabel1;
@@ -182,16 +205,42 @@ public class MainWindow extends javax.swing.JFrame implements CommandListener {
    private javax.swing.JTextField jTextField6;
    // End of variables declaration//GEN-END:variables
 
-   @Override
-   public void actionPerformed(Command command) {
 
+
+   /**
+    * Updates the values of the text labes. Is invoked in AWT queue.
+    * 
+    * @param command
+    */
+   @Override
+   public void processCommand(final Command command) {
+
+      java.awt.EventQueue.invokeLater(new Runnable() {
+         @Override
+            public void run() {
       jTextField1.setText(String.valueOf(command.getAngles()[0]));
       jTextField2.setText(String.valueOf(command.getAngles()[1]));
       jTextField3.setText(String.valueOf(command.getAngles()[2]));
       jTextField4.setText(String.valueOf(command.getAngles()[3]));
       jTextField5.setText(String.valueOf(command.getAngles()[4]));
       jTextField6.setText(String.valueOf(command.getAngles()[5]));
-     
+            }
+        });  
    }
+
+   /**
+    * Updates the Text Fields
+    * 
+    * @param command
+    */
+   public void updateTextFields(Command command) {
+      jTextField1.setText(String.valueOf(command.getAngles()[0]));
+      jTextField2.setText(String.valueOf(command.getAngles()[1]));
+      jTextField3.setText(String.valueOf(command.getAngles()[2]));
+      jTextField4.setText(String.valueOf(command.getAngles()[3]));
+      jTextField5.setText(String.valueOf(command.getAngles()[4]));
+      jTextField6.setText(String.valueOf(command.getAngles()[5]));
+   }
+
 
 }

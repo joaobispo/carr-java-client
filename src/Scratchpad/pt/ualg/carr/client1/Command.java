@@ -17,8 +17,6 @@
 
 package pt.ualg.carr.client1;
 
-import java.util.Arrays;
-
 /**
  * Contains all the information for giving a command to the Car. This includes:
  * <p>- 6 angles that go from 0 to 179.
