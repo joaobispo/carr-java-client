@@ -34,6 +34,7 @@ import pt.ualg.carr.client1.Command;
 import pt.ualg.carr.client1.ListenerExample;
 import pt.ualg.carr.client1.SignalGenerator;
 import pt.ualg.carr.gui.MainWindow;
+import pt.ualg.carr.gui2.MainScreen;
 
 /**
  *
@@ -47,8 +48,10 @@ public class TestMain {
     public static void main(String[] args) {
 
        //testSerialComm();
-       testCarPadInput();
        //testCarPadInputOnly();
+
+       //testCarPadInput();
+       testGui2();
     }
 
    public static void testSerialComm() {
@@ -158,6 +161,11 @@ String commPortName = "COM4";
          }
          
       }
+   }
+
+   private static void testGui2() {
+      MainScreen mainScreen = new MainScreen(Command.NUM_PORTS);
+      mainScreen.setVisible();
    }
 
 }

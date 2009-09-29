@@ -30,7 +30,7 @@ public class ListenerExample implements CommandListener {
 
 
    @Override
-   public void actionPerformed(Command command) {
+   public void processCommand(Command command) {
 
       int index = 1;
 

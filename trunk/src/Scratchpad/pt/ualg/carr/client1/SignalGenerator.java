@@ -51,7 +51,7 @@ public class SignalGenerator implements Runnable {
          // Send the command to all listeners
          if(command != null) {
             for(CommandListener listener : listeners) {
-               listener.actionPerformed(command);
+               listener.processCommand(command);
             }
          }
 
