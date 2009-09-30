@@ -24,13 +24,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
+import pt.ualg.carr.client1.Command;
+import pt.ualg.carr.client1.CommandListener;
 
 /**
  * Main screen of Car Client
  *
  * @author Joao Bispo
  */
-public class MainScreen {
+public class MainScreen implements CommandListener {
 
    public MainScreen(int numInputs) {
       this.numInputs = numInputs;
@@ -51,6 +53,15 @@ public class MainScreen {
             windowFrame.setVisible(true);
          }
 
+      });
+   }
+
+   public void dispose() {
+      EventQueue.invokeLater(new Runnable() {
+         @Override
+         public void run() {
+            windowFrame.dispose();
+         }
       });
    }
 
@@ -86,64 +97,6 @@ public class MainScreen {
 
    }
 
-   /*
-   private void initComponents() {
-      windowFrame = new JFrame();
-      jLabels = new JLabel[numInputs];
-      jTextFields = new JTextField[numInputs];
-
-      Container contentPane = windowFrame.getContentPane();
-      GroupLayout layout = new GroupLayout(contentPane);
-
-      contentPane.setLayout(layout);
-      
-      ParallelGroup parallelGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING);
-      //SequentialGroup sequentialGroup = layout.createSequentialGroup();
-      //ParallelGroup jTextFieldGroup = layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false);
-
-      //parallelGroup.addGroup(layout.createSequentialGroup());
-      //sequentialGroup.addContainerGap();
-      //sequentialGroup.addGroup(jTextFieldGroup);
-
-      for(int i=0; i<numInputs; i++) {
-         // Create JTextFields
-         jTextFields[i] = new JTextField();
-         // Setup JTextFields
-         jTextFields[i].setEditable(false);
-         parallelGroup.addComponent(jTextFields[i], GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE);
-         //jTextFieldGroup.addComponent(jTextFields[i], javax.swing.GroupLayout.Alignment.TRAILING);
-         //contentPane.add(jTextFields[i]);
-
-         // Create JLabels
-         jLabels[i] = new JLabel();
-         // Setup JLabels
-         jLabels[i].setText("Port "+(i+1));
-         //contentPane.add(jLabels[i]);
-         //parallelGroup.addComponent(jLabels[i], javax.swing.GroupLayout.Alignment.TRAILING);
-
-
-         // Setup disposition
-      }
-
-      layout.setHorizontalGroup(parallelGroup);
-      layout.setVerticalGroup();
-      
-      
-      // Setup frame
-      windowFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-      windowFrame.pack();
-
-      javax.swing.
-   }
-    */
-
-   /*
-   public static MainScreen createScreen() {
-      MainScreenLauncher launcher = new MainScreenLauncher();
-      EventQueue.invokeAndWait(launcher);
-      return launcher.getMainScreen();
-   }
-    */
 
    /**
     * INSTANCE VARIABLES
@@ -153,19 +106,17 @@ public class MainScreen {
    private JTextField[] jTextFields;
    private int numInputs;
 
+   @Override
+   public void processCommand(final Command command) {
+      EventQueue.invokeLater(new Runnable() {
 
-   /*
-   class MainScreenLauncher implements Runnable {
-      @Override
-      public void run() {
-         mainScreen = new MainScreen();
-      }
-
-      public MainScreen getMainScreen() {
-         return mainScreen;
-      }
-
-      private MainScreen mainScreen;
+         @Override
+         public void run() {
+            for(int i=0; i<numInputs; i++) {
+               jTextFields[i].setText(String.valueOf(command.getAngles()[i]));
+            }
+         }
+      });
    }
-    */
+
 }

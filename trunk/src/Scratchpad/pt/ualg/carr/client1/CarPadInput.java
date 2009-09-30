@@ -88,8 +88,11 @@ public class CarPadInput implements Runnable {
             readInt = inputStream.read();
          } catch (IOException ex) {
             logger.severe("IO Exception while trying to read inputStream of CarPad.");
+            
+            // Shutdown thread
             inputPort.close();
-            initializeInputStream();
+            shutdown();
+            //initializeInputStream();
          }
 
          //System.out.println("ReadInt:"+readInt);
@@ -180,6 +183,12 @@ public class CarPadInput implements Runnable {
       }
  */
    }
+
+   public void setChannel(BlockingQueue<Command> channel) {
+      this.channel = channel;
+   }
+
+   
 
    /**
     * INSTANCE VARIABLES

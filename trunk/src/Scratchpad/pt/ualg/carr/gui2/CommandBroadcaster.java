@@ -15,8 +15,9 @@
  *  under the License.
  */
 
-package pt.ualg.carr.client1;
+package pt.ualg.carr.gui2;
 
+import pt.ualg.carr.client1.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -24,12 +25,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Sends Command objects to its Listeners.
  *
  * @author Joao Bispo
  */
-public class SignalGenerator implements Runnable {
+public class CommandBroadcaster implements Runnable {
 
-   public SignalGenerator(BlockingQueue<Command> channel) {
+   public CommandBroadcaster(BlockingQueue<Command> channel) {
       this.channel = channel;
       this.listeners = new ArrayList<CommandListener>();
       this.run = true;
@@ -44,7 +46,9 @@ public class SignalGenerator implements Runnable {
          try {            
             command = channel.take();
          } catch (InterruptedException ex) {
-            logger.severe("Thread Interrupted.");
+            if(run) {
+               logger.warning("Thread was interrupted without shuting down SignalGenerator first.");
+            }
             Thread.currentThread().interrupt();
          }
 
@@ -59,7 +63,7 @@ public class SignalGenerator implements Runnable {
    }
 
    /**
-    * Adds a listener to this SignalGenerator.
+    * Adds a listener to this CommandBroadcaster.
     *
     * @param listener
     */
