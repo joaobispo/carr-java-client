@@ -37,7 +37,8 @@ import pt.ualg.carr.client1.Command;
 import pt.ualg.carr.client1.ListenerExample;
 import pt.ualg.carr.gui2.CommandBroadcaster;
 import pt.ualg.carr.gui.MainWindow;
-import pt.ualg.carr.gui2.ControllerSerialPort;
+import pt.ualg.carr.gui2.CarpadController;
+import pt.ualg.carr.gui2.KeyboardController;
 import pt.ualg.carr.gui2.MainProgram;
 import pt.ualg.carr.gui2.MainScreen;
 
@@ -65,6 +66,7 @@ public class TestMain {
        //testInputInterruption();
 
        // testControllerSerial();
+      //testKeybController();
     }
 
    public static void testSerialComm() {
@@ -194,7 +196,7 @@ String commPortName = "COM4";
 
       // Create carPad
       //final CarPadInput carPad = new CarPadInput(channel, "COM4");
-      final ControllerSerialPort carPad = new ControllerSerialPort("COM4", channel);
+      final CarpadController carPad = new CarpadController("COM4", channel);
 
       // Executor
       ExecutorService signalExecutor = Executors.newSingleThreadExecutor();
@@ -290,27 +292,27 @@ String commPortName = "COM4";
    }
 
    private static void testControllerSerial() {
-      System.out.println("Found ports: "+ControllerSerialPort.listSerialPorts());
+      System.out.println("Found ports: "+CarpadController.listSerialPorts());
 
-      //String comPort = ControllerSerialPort.findCarController();
-      //System.out.println(ControllerSerialPort.testPort("qq coisa"));
+      //String comPort = CarpadController.findCarController();
+      //System.out.println(CarpadController.testPort("qq coisa"));
 
       System.out.println("Launching CarPad");
       BlockingQueue<Command> channel = new ArrayBlockingQueue<Command>(1);
-      ControllerSerialPort carPad = new ControllerSerialPort("COM4", channel);
+      CarpadController carPad = new CarpadController("COM4", channel);
       ExecutorService carPadExecutor = Executors.newSingleThreadExecutor();
       carPadExecutor.execute(carPad);
 
       carPadExecutor.shutdown();
       /*
-      SerialPort serialPort = ControllerSerialPort.connectSerial("COM3", "Testing Ports");
+      SerialPort serialPort = CarpadController.connectSerial("COM3", "Testing Ports");
 
       if(serialPort != null) {
          System.out.println("Port could be opened!");
          serialPort.close();
       }
 
-      SerialPort serialPort2 = ControllerSerialPort.connectSerial("COM3", "Testing Ports");
+      SerialPort serialPort2 = CarpadController.connectSerial("COM3", "Testing Ports");
 
       if(serialPort2 != null) {
          System.out.println("Port could be opened again!");
@@ -335,8 +337,20 @@ String commPortName = "COM4";
             }
         } else {
             System.out.println("Operating System '"+os+"' not supported.");
-            System.exit(1);
+            //System.exit(1);
         }
     }
+
+   private static void testKeybController() {
+      BlockingQueue<Command> inputChannel = new ArrayBlockingQueue<Command>(1);
+      BlockingQueue<Command> outputChannel = new ArrayBlockingQueue<Command>(1);
+      KeyboardController keyb = new KeyboardController(inputChannel, outputChannel, 40);
+
+      ExecutorService keybExecutor = Executors.newSingleThreadExecutor();
+      keybExecutor.execute(keyb);
+      keybExecutor.shutdown();
+
+
+   }
 
 }
