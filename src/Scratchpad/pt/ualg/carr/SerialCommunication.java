@@ -29,7 +29,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import processing.app.Preferences;
 
 /**
  *
@@ -83,30 +82,6 @@ public class SerialCommunication {
 
    }
 
-   public void runWithProcessing() {
-      Preferences p = new Preferences();
-
-      String port = Preferences.get("serial.port");
-      System.out.println("Port:"+port);
-
-      /*
-		System.out.println("Using port: " + Preferences.get("serial.port"));
-		CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(
-				Preferences.get("serial.port"));
-		SerialPort port = (SerialPort)portId.open("serial madness", 4000);
-        input = port.getInputStream();
-        output = port.getOutputStream();
-        port.setSerialPortParams(
-			      Preferences.getInteger("serial.debug_rate"),
-			      SerialPort.DATABITS_8,
-			      SerialPort.STOPBITS_1,
-			      SerialPort.PARITY_NONE);
-		while(true){
-			while (input.available()>0)
-				System.out.print((char)(input.read()));
-		}
-       */
-   }
 
    /**
     * 
