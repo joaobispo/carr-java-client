@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import pt.amaze.ASL.LoggingUtils;
 import pt.ualg.carr.client1.CarPadInput;
 import pt.ualg.carr.client1.Command;
 import pt.ualg.carr.client1.ListenerExample;
@@ -51,16 +52,19 @@ public class TestMain {
      */
     public static void main(String[] args) {
 
+       LoggingUtils.setupConsoleOnly();
+
         testLibraryExists();
 
        //testSerialComm();
        //testCarPadInputOnly();
 
        //testCarPadInput();
-       //testGui2();
+       testGui2();
        //testProgramV1();
        //testInputInterruption();
-       testControllerSerial();
+
+       // testControllerSerial();
     }
 
    public static void testSerialComm() {
@@ -189,7 +193,8 @@ String commPortName = "COM4";
       signalGen.addListener(mainScreen);
 
       // Create carPad
-      final CarPadInput carPad = new CarPadInput(channel, "COM4");
+      //final CarPadInput carPad = new CarPadInput(channel, "COM4");
+      final ControllerSerialPort carPad = new ControllerSerialPort("COM4", channel);
 
       // Executor
       ExecutorService signalExecutor = Executors.newSingleThreadExecutor();
@@ -287,8 +292,16 @@ String commPortName = "COM4";
    private static void testControllerSerial() {
       System.out.println("Found ports: "+ControllerSerialPort.listSerialPorts());
 
-      String comPort = ControllerSerialPort.findCarController();
+      //String comPort = ControllerSerialPort.findCarController();
+      //System.out.println(ControllerSerialPort.testPort("qq coisa"));
 
+      System.out.println("Launching CarPad");
+      BlockingQueue<Command> channel = new ArrayBlockingQueue<Command>(1);
+      ControllerSerialPort carPad = new ControllerSerialPort("COM4", channel);
+      ExecutorService carPadExecutor = Executors.newSingleThreadExecutor();
+      carPadExecutor.execute(carPad);
+
+      carPadExecutor.shutdown();
       /*
       SerialPort serialPort = ControllerSerialPort.connectSerial("COM3", "Testing Ports");
 

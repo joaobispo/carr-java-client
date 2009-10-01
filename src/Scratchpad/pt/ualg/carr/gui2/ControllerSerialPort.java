@@ -26,8 +26,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.concurrent.BlockingQueue;
 import java.util.logging.Logger;
+import pt.amaze.ASL.TimeUtils;
 import pt.ualg.carr.client1.Command;
 
 /**
@@ -35,8 +36,149 @@ import pt.ualg.carr.client1.Command;
  *
  * @author Joao Bispo
  */
-public class ControllerSerialPort {
+public class ControllerSerialPort implements Runnable {
 
+   // Creates an object using the default serial port.
+   // This port is operating-system dependent.
+   public ControllerSerialPort(BlockingQueue<Command> channel) {
+      // Assign default ports, according to operating system
+      this(defaultCommPortName(), channel);
+   }
+
+   public ControllerSerialPort(String commPortName, BlockingQueue<Command> channel) {
+      this.commPortName = commPortName;
+      this.channel = channel;
+      run = false;
+      packetCounter = 0;
+   }
+
+
+
+
+
+   @Override  
+   public void run() {
+      // Test if port name is not null. If it is, give mock content
+      if (commPortName == null) {
+         commPortName = "";
+      }
+
+      // Test if CarPad is connect to port
+      boolean isConnected = testPort(commPortName);
+      // If not, try to find the correct port
+      if(!isConnected) {
+         commPortName = findCarController();
+      }
+
+      // Test again for null, commPortName could have been not found
+      if(commPortName == null) {
+         logger.warning("Could not found CarPad.");
+         return;
+      }
+
+      // Connection is possible, try to establish communication.
+      run = true;
+      SerialPort serialPort = connectSerial(commPortName, "CarPad port at '"+commPortName+"'.");
+
+      if(serialPort == null) {
+         run = false;
+         return;
+      }
+      // From this moment on, the serial port is connect. Before exiting the
+      // method, it needs to be closed.
+
+      // Declare the inputStream
+      InputStream inputStream;
+
+      try {
+
+      // Create InputStream
+      inputStream = serialPort.getInputStream();
+
+      // Read input stream as fast as it can
+      while(run) {
+         int readInt = inputStream.read();
+
+         // If read number is commandStart, process package and put it in the queue.
+         if(readInt == COMMAND_START) {
+            processCommand(inputStream);
+         }
+         // If it is not, go to the next cycles, until it appears
+
+      }
+
+      } catch (IOException ex) {
+         // If there was an error, close the SerialPort and go to the next port.
+         logger.warning("IOException while using CarController.");
+         serialPort.close();
+         serialPort = null;
+         run = false;
+         return;
+      }
+
+      // Finished execution. Close open streams
+      if(inputStream != null) {
+         try {
+            inputStream.close();
+         } catch (IOException ex) {
+            logger.warning("IOException while trying to close InputStream of CarController.");
+         }
+      }
+
+      // Close Serial Port
+      serialPort.close();
+      serialPort = null;
+   }
+
+    /**
+    * Creates a Command object and puts it in the queue, if the queue is empty.
+    */
+   private void processCommand(InputStream inputStream) throws IOException {
+      // Create array for inputs
+      int[] angles = new int[Command.NUM_PORTS];
+
+      // Read as many commands as necessary
+      for(int i=0; i<Command.NUM_PORTS; i++) {
+            angles[i] = inputStream.read();
+      }
+
+      // Build the command object
+      Command command = new Command(packetCounter, angles);
+      packetCounter++;
+
+      // Try to put object in queue
+      boolean success = channel.offer(command);
+
+
+      if(!success) {
+         logger.info("Dropped command "+command.getCounter());
+      }
+
+   }
+
+   /**
+    * Stops the reading of CarPad input signals
+    */
+   public void shutdown() {
+      run = false;
+   }
+
+   /**
+    * @return the default COM port name, according to operating system.
+    */
+   private static String defaultCommPortName() {
+      String os = System.getProperty("os.name");
+      String lowerOs = os.toLowerCase();
+
+        if(lowerOs.startsWith("windows")) {
+           return "COM4";
+        } else if(lowerOs.startsWith("linux")){
+            return "/dev/ttyUSB0";
+        } else {
+         logger.warning("Operating System '"+os+"' not supported, returning empty string.");
+         return "";
+        }
+   }
 
    /**
     * List the available serial ports
@@ -120,7 +262,7 @@ public class ControllerSerialPort {
     * @param portName
     * @return
     */
-   private static boolean testPort(String portName) {
+   public static boolean testPort(String portName) {
       
       // Connect to the serial port
       SerialPort serialPort = connectSerial(portName, "Testing port "+portName);
@@ -170,14 +312,22 @@ public class ControllerSerialPort {
 
       // If it is a -1, accept some '-1' before discarding it
       boolean isMinusOne = readInt == -1;
+      long initialNanos = System.nanoTime();
       if(isMinusOne) {
-         int counter = 0;
-         System.out.print("|");
+         //int counter = 0;
+         //System.out.print("|");
          while(isMinusOne) {
+            // Test if there is a timeout
+            long elapsedTime = System.nanoTime() - initialNanos;
+            if(elapsedTime > INPUTSTREAM_TIMEOUT_NANOS) {
+               System.out.println("Timeout");
+               return false;
+            }
             readInt = inputStream.read();
             isMinusOne = readInt == -1;
             //System.out.println("ReadInt:"+readInt + " ("+counter+")");
 
+            /*
             counter++;
             // Update counter status
             if(counter == COUNTER_TIMEOUT_FIRST_QUARTER) {
@@ -189,14 +339,17 @@ public class ControllerSerialPort {
             if(counter == COUNTER_TIMEOUT_THIRD_QUARTER) {
                System.out.print("75|");
             }
+             */
 
             // If counter timeout, conclude this is not the portif()
+           /*
             boolean counterTimeout = counter > COUNTER_TIMEOUT;
             if(counterTimeout) {
                System.out.print("100|");
                System.out.println(" - Timeout");
                return false;
             }
+            */
          }
       }
       // Add a new line.
@@ -241,10 +394,26 @@ public class ControllerSerialPort {
     * INSTANCE VARIABLES
     */
    private static final Logger logger = Logger.getLogger(ControllerSerialPort.class.getName());
+   /*
    private static final int COUNTER_TIMEOUT = 40;
    private static final int COUNTER_TIMEOUT_FIRST_QUARTER = (COUNTER_TIMEOUT / 4);
    private static final int COUNTER_TIMEOUT_SECOND_QUARTER = (COUNTER_TIMEOUT / 4) * 2;
    private static final int COUNTER_TIMEOUT_THIRD_QUARTER = (COUNTER_TIMEOUT / 4) * 3;
+    */
+   private static final long INPUTSTREAM_TIMEOUT_NANOS = TimeUtils.millisToNanos(3000);
+   // Signal sent by CarPad indicating start of a package.
+   private static final int COMMAND_START = 255;
+   // Name of the Communication Port
+   private String commPortName;
+   // Indicates if the object should run or not.
+   private boolean run;
+   // Number to be send in the generated command packet
+   private int packetCounter;
+   // Queue to where the commands will be sent.
+   private BlockingQueue<Command> channel;
+
+
+
 
 
 
