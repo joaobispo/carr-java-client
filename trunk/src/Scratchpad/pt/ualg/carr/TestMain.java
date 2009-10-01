@@ -22,6 +22,7 @@ import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
 import java.awt.Window;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -49,6 +50,8 @@ public class TestMain {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+
+        testLibraryExists();
 
        //testSerialComm();
        //testCarPadInputOnly();
@@ -304,5 +307,22 @@ String commPortName = "COM4";
 
       
    }
+
+    private static void testLibraryExists() {
+        String os = System.getProperty("os.name");
+        String lowerOs = os.toLowerCase();
+
+        if(lowerOs.startsWith("windows")) {
+            // Check for DLLs
+            File rxtxSerial = new File("rxtxSerial.dll");
+            if(!rxtxSerial.exists()) {
+                System.out.println("Missing file: rxtxSerial.dll. Exiting...");
+                System.exit(1);
+            }
+        } else {
+            System.out.println("Operating System '"+os+"' not supported.");
+            System.exit(1);
+        }
+    }
 
 }
