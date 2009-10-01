@@ -94,13 +94,14 @@ public class ControllerSerialPort {
     */
    public static SerialPort connectSerial(String portName, String portMessage) {
       SerialPort serialPort = null;
+      int millisWait = 500;
 
       try {
          // Obtain a CommPortIdentifier object for the port you want to open
          CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(portName);
 
          // Get the port's ownership
-         serialPort = (SerialPort) portId.open(portMessage, 5000);
+         serialPort = (SerialPort) portId.open(portMessage, millisWait);
 
       } catch (NoSuchPortException ex) {
          logger.warning("Serial Port '" + portName + "' not found.");
@@ -240,7 +241,7 @@ public class ControllerSerialPort {
     * INSTANCE VARIABLES
     */
    private static final Logger logger = Logger.getLogger(ControllerSerialPort.class.getName());
-   private static final int COUNTER_TIMEOUT = 100;
+   private static final int COUNTER_TIMEOUT = 40;
    private static final int COUNTER_TIMEOUT_FIRST_QUARTER = (COUNTER_TIMEOUT / 4);
    private static final int COUNTER_TIMEOUT_SECOND_QUARTER = (COUNTER_TIMEOUT / 4) * 2;
    private static final int COUNTER_TIMEOUT_THIRD_QUARTER = (COUNTER_TIMEOUT / 4) * 3;

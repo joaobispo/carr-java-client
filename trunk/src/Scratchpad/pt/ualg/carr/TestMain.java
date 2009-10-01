@@ -311,6 +311,7 @@ String commPortName = "COM4";
     private static void testLibraryExists() {
         String os = System.getProperty("os.name");
         String lowerOs = os.toLowerCase();
+        System.out.println("Running on '"+os+"'.");
 
         if(lowerOs.startsWith("windows")) {
             // Check for DLLs
