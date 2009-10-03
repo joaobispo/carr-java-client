@@ -215,7 +215,11 @@ public class CarpadController implements Runnable {
       // Test each port
       for(String portName : serialPorts) {
          System.out.print("Testing port ["+portName+"]:");
+         // REMOVE
+         System.out.println("Before testing port");
          boolean isCarPadPort = testPort(portName);
+         // REMOVE
+         System.out.println("After testing port");
          if(isCarPadPort) {
             System.out.println(" - Found CarPad!");
             return portName;
@@ -263,7 +267,6 @@ public class CarpadController implements Runnable {
     * @return
     */
    public static boolean testPort(String portName) {
-      
       // Connect to the serial port
       SerialPort serialPort = connectSerial(portName, "Testing port "+portName);
 
@@ -306,13 +309,58 @@ public class CarpadController implements Runnable {
     * @return
     */
    private static boolean testInputStream(InputStream inputStream) throws IOException {
+      // REMOVE
+      //System.out.println("Entered inputStream");
+      // Check how many bytes are avaliable from this inputs stream before blocking
+      //int numReads = inputStream.available();
+      //System.out.println("Num reads before blocking: "+numReads);
+      
+      // Port can be read without blocking
+      /*
+      if(numReads == 0) {
+         return false;
+      }
+       */
 
-      // Check if port is outputing '-1'
+      // Inputstream can be read safely
       int readInt = inputStream.read();
+      // REMOVE
+      //System.out.println("Read int ("+readInt+")");
+      
+      boolean is255 = readInt == 255;
+      long initialNanos = System.nanoTime();
+      while (!is255) {
+         // Test if there is a timeout
+         long elapsedTime = System.nanoTime() - initialNanos;
+         if (elapsedTime > INPUTSTREAM_TIMEOUT_NANOS) {
+            System.out.println("Timeout");
+            return false;
+         }
 
+         // Test if there are more bytes to read
+         /*
+         numReads = inputStream.available();
+         if (numReads == 0) {
+            return false;
+         }
+          */
+
+         // Read again
+         readInt = inputStream.read();
+         is255 = readInt == 255;
+
+      }
+      
+      // Check if port is outputing a 255
+
+      //int readInt = inputStream.
+
+      // REMOVE
+
+      /*
       // If it is a -1, accept some '-1' before discarding it
       boolean isMinusOne = readInt == -1;
-      long initialNanos = System.nanoTime();
+      //long initialNanos = System.nanoTime();
       if(isMinusOne) {
          //int counter = 0;
          //System.out.print("|");
@@ -323,10 +371,14 @@ public class CarpadController implements Runnable {
                System.out.println("Timeout");
                return false;
             }
+
+            // REMOVE
+            System.out.println("Elapsed Time:"+elapsedTime+"; Timeout:"+INPUTSTREAM_TIMEOUT_NANOS);
+
             readInt = inputStream.read();
             isMinusOne = readInt == -1;
             //System.out.println("ReadInt:"+readInt + " ("+counter+")");
-
+*/
             /*
             counter++;
             // Update counter status
@@ -350,8 +402,10 @@ public class CarpadController implements Runnable {
                return false;
             }
             */
+/*
          }
       }
+ */
       // Add a new line.
       //System.out.println("");
 
@@ -366,7 +420,7 @@ public class CarpadController implements Runnable {
          periodCounter++;
 
          // Check if it already passed the time a 255 should have appeard.
-         if(periodCounter >= period ) {
+         if(periodCounter > period ) {
             return false;
          }
       }
