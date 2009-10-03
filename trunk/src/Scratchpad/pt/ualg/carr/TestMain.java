@@ -182,6 +182,7 @@ String commPortName = "COM4";
    }
 
    private static void testGui2() {
+      System.out.println("Found ports: "+CarpadController.listSerialPorts());
 
       // Create Screen
       MainScreen mainScreen = new MainScreen(Command.NUM_PORTS);
@@ -197,6 +198,7 @@ String commPortName = "COM4";
       // Create carPad
       //final CarPadInput carPad = new CarPadInput(channel, "COM4");
       final CarpadController carPad = new CarpadController("COM4", channel);
+      //final CarpadController carPad = new CarpadController("/dev/ttyS0", channel);
 
       // Executor
       ExecutorService signalExecutor = Executors.newSingleThreadExecutor();
