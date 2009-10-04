@@ -17,16 +17,44 @@
 
 package pt.ualg.carr.gui3;
 
+import pt.ualg.Car.common.GuiUtils;
+import pt.ualg.carr.client1.Command;
+
 /**
  *
  * @author Joao Bispo
  */
 public class GuiModel {
 
+   public GuiModel() {
+      command = new Command(-1, new int[Command.NUM_PORTS]);
+      mainScreen = new MainScreen(Command.NUM_PORTS);
+   }
+
+
+   /**
+    * Initialize GUI
+    */
+   public void init() {
+      // Init Windows Components
+      GuiUtils.runOnEdt(new Runnable() {
+         @Override
+         public void run() {
+            mainScreen.initComponents();
+            mainScreen.getWindowFrame().setVisible(true);
+         }
+      }
+      );
+
+
+
+   }
+
    /**
     * INSTANCE VARIABLES
     */
    // State
+   private Command command;
 
    // Windows
    private MainScreen mainScreen;
