@@ -26,11 +26,13 @@ import javax.swing.SwingUtilities;
  */
 public class GuiUtils {
 
-   public static void runOnEdt(final Runnable r) throws InvocationTargetException {
+   public static void runOnEdt(final Runnable r) {
+
       if (SwingUtilities.isEventDispatchThread()) {
          r.run();
       } else {
          SwingUtilities.invokeLater(r);
       }
+
    }
 }

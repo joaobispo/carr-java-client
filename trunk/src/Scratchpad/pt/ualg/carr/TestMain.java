@@ -41,6 +41,7 @@ import pt.ualg.carr.gui2.CarpadController;
 import pt.ualg.carr.gui2.KeyboardController;
 import pt.ualg.carr.gui2.MainProgram;
 import pt.ualg.carr.gui2.MainScreen;
+import pt.ualg.carr.gui3.GuiModel;
 
 /**
  *
@@ -61,12 +62,16 @@ public class TestMain {
        //testCarPadInputOnly();
 
        //testCarPadInput();
-       testGui2();
+
+        testGui2();
+
        //testProgramV1();
        //testInputInterruption();
 
        // testControllerSerial();
       //testKeybController();
+
+        //testGui3();
     }
 
    public static void testSerialComm() {
@@ -207,6 +212,8 @@ String commPortName = "COM4";
       final ExecutorService carPadExecutor = Executors.newSingleThreadExecutor();
       carPadExecutor.execute(carPad);
 
+      // Try to connect if disconnected
+      /*
       carPadExecutor.execute(new Runnable() {
 
          @Override
@@ -221,6 +228,7 @@ String commPortName = "COM4";
             carPadExecutor.execute(this);
          }
       });
+       */
 
       try {
          Thread.sleep(100000);
@@ -353,6 +361,11 @@ String commPortName = "COM4";
       keybExecutor.shutdown();
 
 
+   }
+
+   private static void testGui3() {
+      GuiModel guiModel = new GuiModel();
+      guiModel.init();
    }
 
 }

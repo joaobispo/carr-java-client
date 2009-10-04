@@ -17,7 +17,6 @@
 
 package pt.ualg.carr.gui3;
 
-import java.awt.EventQueue;
 import java.awt.GridLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;

@@ -21,14 +21,25 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
+import gnu.io.UnsupportedCommOperationException;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import pt.amaze.ASL.TimeUtils;
+import pt.ualg.Car.common.ConcurrentUtils;
 import pt.ualg.carr.client1.Command;
 
 /**
@@ -65,6 +76,8 @@ public class CarpadController implements Runnable {
 
       // Test if CarPad is connect to port
       boolean isConnected = testPort(commPortName);
+      //boolean isConnected = testPortSafe(commPortName);
+      System.out.println("After testPort 1. IsConnected: "+isConnected);
       // If not, try to find the correct port
       if(!isConnected) {
          commPortName = findCarController();
@@ -223,6 +236,8 @@ public class CarpadController implements Runnable {
          if(isCarPadPort) {
             System.out.println(" - Found CarPad!");
             return portName;
+         } else {
+            System.out.println(" - Not Found.");
          }
       }
 
@@ -249,12 +264,23 @@ public class CarpadController implements Runnable {
          // Get the port's ownership
          serialPort = (SerialPort) portId.open(portMessage, millisWait);
 
+         // Setup the Serial Port
+         serialPort.setSerialPortParams(9600,
+                 SerialPort.DATABITS_8,
+                 SerialPort.STOPBITS_1,
+                 SerialPort.PARITY_NONE);
+
+
+         serialPort.enableReceiveTimeout(2000);
+
       } catch (NoSuchPortException ex) {
          logger.warning("Serial Port '" + portName + "' not found.");
          return null;
       } catch (PortInUseException ex) {
          logger.warning("Serial Port '" + portName + "' is already in use.");
          return null;
+      } catch (UnsupportedCommOperationException e) {
+         logger.warning("Serial Port '" + portName + "' could not be setup.");
       }
 
       return serialPort;
@@ -279,15 +305,22 @@ public class CarpadController implements Runnable {
 
       try {
          // Listen to the port to see if the output is the expected
-         InputStream inputStream = serialPort.getInputStream();
+         InputStream inputStream = new BufferedInputStream(serialPort.getInputStream());
+         //InputStream inputStream = serialPort.getInputStream();
 
+         System.out.println("Before testInputStream");
          boolean isCarPad = testInputStream(inputStream);
+         //boolean isCarPad = testInputStreamSafe(inputStream);
+         System.out.println("After calling testInputstream.");
          // After testInputStream, we should add a new line to System.out.
          //System.out.println("");
 
          // Stream was tested, port can be closed now.
+         System.out.println("Before inpustreaclose");
          inputStream.close();
+         System.out.println("After inpustreaclose");
          serialPort.close();
+         System.out.println("After serialPortClose");
          serialPort = null;
 
          return isCarPad;
@@ -302,13 +335,155 @@ public class CarpadController implements Runnable {
    }
 
 
+
+   private static boolean testPortSafe(final String portName) {
+  // Create Executor
+      ExecutorService testExec = Executors.newSingleThreadExecutor();
+
+
+      // REMOVE
+      System.out.println("Before submitting the callable");
+
+      // Get result from test
+
+      Boolean testResultBool = null;
+      try {
+         Future<Boolean> testResult = testExec.submit(new Callable<Boolean>() {
+
+         @Override
+         public Boolean call() throws IOException, InterruptedException {
+            return testPort(portName);
+         }
+
+      });
+
+
+
+
+         //REMOVE
+         System.out.println("Waiting for the result (and the timeout)");
+         // Get result, and check for Timeout
+         testResultBool = testResult.get(INPUTSTREAM_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+      } catch (InterruptedException ex) {
+         logger.warning("Thread interrupted.");
+         Thread.currentThread().interrupt();
+      } catch (ExecutionException ex) {
+         logger.warning("testInputStream cause an exception.");
+      } catch (TimeoutException ex) {
+         System.out.println("There was a Timeout");
+         // There was a TimeOut; Cancel Execution of Future
+         /*
+         testResult.cancel(true);
+         //testExec.shutdownNow();
+         testResultBool = false;
+
+         System.out.println("Is DOne? "+testResult.isDone());
+*/
+         ConcurrentUtils.shutdownAndAwaitTermination(testExec);
+
+         System.out.println("Is Terminated? "+testExec.isTerminated());
+      }
+
+      System.out.println("After Try block. Bool result: "+testResultBool);
+
+      // Just a check to confirm everything is alright
+      if(testResultBool == null) {
+         logger.warning("Boolean result is null. Returning false");
+         return false;
+      }
+      // Shutdown
+      testExec.shutdownNow();
+
+
+      // Return result
+      System.out.println("just before return.");
+      return testResultBool;
+
+   }
+
    /**
     * Reads the input stream as looks for the pattern of the Car Pad input.
+    *
+    * @param inputStream
+    * @return
+    * @throws IOException
+    */
+   private static boolean testInputStreamSafe(final InputStream inputStream) throws IOException {
+      // Create Executor
+      ExecutorService testExec = Executors.newSingleThreadExecutor();
+
+
+      // REMOVE
+      System.out.println("Before submitting the callable");
+
+      // Get result from test
+      
+      Boolean testResultBool = null;
+      try {
+         Future<Boolean> testResult = testExec.submit(new Callable<Boolean>() {
+
+         @Override
+         public Boolean call() throws IOException, InterruptedException {
+            return testInputStream(inputStream);
+         }
+
+      });
+
+      
+
+      
+         //REMOVE
+         System.out.println("Waiting for the result (and the timeout)");
+         // Get result, and check for Timeout
+         testResultBool = testResult.get(INPUTSTREAM_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+      } catch (InterruptedException ex) {
+         logger.warning("Thread interrupted.");
+         Thread.currentThread().interrupt();
+      } catch (ExecutionException ex) {
+         logger.warning("testInputStream cause an exception.");
+      } catch (TimeoutException ex) {
+         System.out.println("There was a Timeout");
+         // There was a TimeOut; Cancel Execution of Future
+         /*
+         testResult.cancel(true);
+         //testExec.shutdownNow();
+         testResultBool = false;
+
+         System.out.println("Is DOne? "+testResult.isDone());
+*/
+         ConcurrentUtils.shutdownAndAwaitTermination(testExec);
+
+         System.out.println("Is Terminated? "+testExec.isTerminated());
+      }
+
+      System.out.println("After Try block. Bool result: "+testResultBool);
+
+      // Just a check to confirm everything is alright
+      if(testResultBool == null) {
+         logger.warning("Boolean result is null. Returning false");
+         return false;
+      }
+      // Shutdown
+      testExec.shutdownNow();
+
+
+      // Return result
+      System.out.println("just before return.");
+      return testResultBool;
+   }
+
+   /**
+    * Reads the input stream as looks for the pattern of the Car Pad input.
+    *
+    * <p>This method is not safe, because it can block on reading an inputstream
+    * which will never have something to read. The method 'testInputStreamSafe'
+    * should be used instead.
     * 
     * @param inputStream
     * @return
     */
    private static boolean testInputStream(InputStream inputStream) throws IOException {
+
       // REMOVE
       //System.out.println("Entered inputStream");
       // Check how many bytes are avaliable from this inputs stream before blocking
@@ -323,7 +498,9 @@ public class CarpadController implements Runnable {
        */
 
       // Inputstream can be read safely
+      System.out.println("Before inputStream read");
       int readInt = inputStream.read();
+      System.out.println("After inputStream read");
       // REMOVE
       //System.out.println("Read int ("+readInt+")");
       
@@ -331,11 +508,13 @@ public class CarpadController implements Runnable {
       long initialNanos = System.nanoTime();
       while (!is255) {
          // Test if there is a timeout
+         
          long elapsedTime = System.nanoTime() - initialNanos;
          if (elapsedTime > INPUTSTREAM_TIMEOUT_NANOS) {
             System.out.println("Timeout");
             return false;
          }
+          
 
          // Test if there are more bytes to read
          /*
@@ -441,6 +620,7 @@ public class CarpadController implements Runnable {
       } else {
          return false;
       }
+      
    }
 
 
@@ -454,7 +634,9 @@ public class CarpadController implements Runnable {
    private static final int COUNTER_TIMEOUT_SECOND_QUARTER = (COUNTER_TIMEOUT / 4) * 2;
    private static final int COUNTER_TIMEOUT_THIRD_QUARTER = (COUNTER_TIMEOUT / 4) * 3;
     */
-   private static final long INPUTSTREAM_TIMEOUT_NANOS = TimeUtils.millisToNanos(3000);
+   private static final long INPUTSTREAM_TIMEOUT_MILLIS = 1000;
+   private static final long INPUTSTREAM_TIMEOUT_NANOS = TimeUtils.millisToNanos(INPUTSTREAM_TIMEOUT_MILLIS);
+   
    // Signal sent by CarPad indicating start of a package.
    private static final int COMMAND_START = 255;
    // Name of the Communication Port
