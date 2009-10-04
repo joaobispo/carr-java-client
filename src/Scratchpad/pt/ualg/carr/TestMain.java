@@ -23,6 +23,7 @@ import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
 import java.awt.Window;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -32,6 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import pt.amaze.ASL.LoggingUtils;
+import pt.ualg.Car.common.Concurrent.ReadChannel;
 import pt.ualg.carr.client1.CarPadInput;
 import pt.ualg.carr.client1.Command;
 import pt.ualg.carr.client1.ListenerExample;
@@ -41,6 +43,7 @@ import pt.ualg.carr.gui2.CarpadController;
 import pt.ualg.carr.gui2.KeyboardController;
 import pt.ualg.carr.gui2.MainProgram;
 import pt.ualg.carr.gui2.MainScreen;
+import pt.ualg.carr.gui3.ArduinoEmulator;
 import pt.ualg.carr.gui3.GuiModel;
 
 /**
@@ -63,7 +66,7 @@ public class TestMain {
 
        //testCarPadInput();
 
-        testGui2();
+        //testGui2();
 
        //testProgramV1();
        //testInputInterruption();
@@ -71,7 +74,7 @@ public class TestMain {
        // testControllerSerial();
       //testKeybController();
 
-        //testGui3();
+        testGui3();
     }
 
    public static void testSerialComm() {
@@ -364,8 +367,29 @@ String commPortName = "COM4";
    }
 
    private static void testGui3() {
-      GuiModel guiModel = new GuiModel();
+      long periodInMillis = 500;
+
+      GuiModel guiModel = new GuiModel(Command.NUM_PORTS);
       guiModel.init();
+
+      
+
+
+      ArduinoEmulator arduino = new ArduinoEmulator(guiModel.getKeyboadValuesReader(), periodInMillis);
+
+      pt.ualg.carr.gui3.CommandBroadcaster broadcaster = new pt.ualg.carr.gui3.CommandBroadcaster(arduino.getReadChannel());
+      broadcaster.addListener(guiModel);
+      
+      //ReadChannel<pt.ualg.carr.gui3.Command> channel = arduino.getReadChannel();
+
+      ExecutorService arduinoExec = Executors.newSingleThreadExecutor();
+      ExecutorService broadcasterExec = Executors.newSingleThreadExecutor();
+      
+      arduinoExec.execute(arduino);
+      broadcasterExec.execute(broadcaster);
+
+      
+       
    }
 
 }

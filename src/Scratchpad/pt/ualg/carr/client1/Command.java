@@ -67,9 +67,18 @@ public class Command {
    }
 
    /**
+    * Resets the global counter of commands to 0.
+    */
+   public void resetGlobalCounter() {
+      globalCounter = 0;
+   }
+
+   /**
     * INSTANCE VARIABLES
     */
    private int counter;
    private final int[] angles;
    public final static int NUM_PORTS = 6;
+   
+   private static int globalCounter = 0;
 }

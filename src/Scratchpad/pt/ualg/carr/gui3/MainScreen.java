@@ -18,12 +18,12 @@
 package pt.ualg.carr.gui3;
 
 import java.awt.GridLayout;
+import java.util.Arrays;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
-import pt.ualg.carr.client1.Command;
 
 /**
  * Main screen of Car Client
@@ -35,44 +35,12 @@ public class MainScreen {
    public MainScreen(int numInputs) {
       this.numInputs = numInputs;
 
-      /*
-      EventQueue.invokeLater(new Runnable() {
-         @Override
-         public void run() {
-            initComponents();
-         }
-      });
-       */
-
    }
 
    public JFrame getWindowFrame() {
       return windowFrame;
    }
-
-
-   /*
-   public void setVisible() {
-      EventQueue.invokeLater(new Runnable() {
-         @Override
-         public void run() {
-            windowFrame.setVisible(true);
-         }
-
-      });
-   }
-    */
-
-   /*
-   public void dispose() {
-      EventQueue.invokeLater(new Runnable() {
-         @Override
-         public void run() {
-            windowFrame.dispose();
-         }
-      });
-   }
-    */
+  
 
    /**
     * Initializes the Swing Components
@@ -114,9 +82,13 @@ public class MainScreen {
     * 
     * @param command
     */
-   public void updateTextFields(Command command) {
+   public void updateTextFields(int[] values) {
+      if(values.length < numInputs) {
+         values = Arrays.copyOf(values, numInputs);
+      }
+
       for(int i=0; i<numInputs; i++) {
-               jTextFields[i].setText(String.valueOf(command.getAngles()[i]));
+               jTextFields[i].setText(String.valueOf(values[i]));
             }
    }
 
@@ -128,21 +100,5 @@ public class MainScreen {
    private JLabel[] jLabels;
    private JTextField[] jTextFields;
    private int numInputs;
-
-
-   /*
-   @Override
-   public void processCommand(final Command command) {
-      EventQueue.invokeLater(new Runnable() {
-
-         @Override
-         public void run() {
-            for(int i=0; i<numInputs; i++) {
-               jTextFields[i].setText(String.valueOf(command.getAngles()[i]));
-            }
-         }
-      });
-   }
-    */
 
 }
