@@ -76,7 +76,7 @@ public class TestMain {
        // testControllerSerial();
       //testKeybController();
 
-        testGui3();
+        attachDetachKeyboard();
     }
 
    public static void testSerialComm() {
@@ -368,12 +368,44 @@ String commPortName = "COM4";
 
    }
 
-   private static void testGui3() {
+   private static void attachDetachKeyboard() {
+      
+      //String portComm = CarpadController.findCarController();
+      //System.out.println("A porta foi: "+portComm);
+      //CarpadController carpad = new CarpadController(null);
+
+
       long millisInPeriod = 40;
 
       Launcher launcher = new Launcher(millisInPeriod);
-      launcher.execute();
       
+      
+      launcher.init();
+      launcher.attachKeyboard();
+      try {
+         Thread.sleep(2000);
+         //launcher.execute();
+      } catch (InterruptedException ex) {
+         Logger.getLogger(TestMain.class.getName()).log(Level.SEVERE, null, ex);
+      }
+
+      
+      launcher.detachKeyboard();
+      System.out.println("Detach!");
+
+      try {
+         Thread.sleep(2000);
+         //launcher.execute();
+      } catch (InterruptedException ex) {
+         Logger.getLogger(TestMain.class.getName()).log(Level.SEVERE, null, ex);
+      }
+
+      
+      launcher.attachKeyboard();
+      System.out.println("Attach Again.");
+      //launcher.execute();
+
+       
        
    }
 

@@ -19,6 +19,7 @@ package pt.ualg.carr.gui3;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -40,7 +41,7 @@ public class Launcher {
       guiModel = new GuiModel();
       guiModel.init();
 
-      attachKeyboard();
+      //attachKeyboard();
    }
 
    /**
@@ -78,14 +79,79 @@ public class Launcher {
       broadcasterExec.execute(broadcaster);
    }
 
-
-   private void attachKeyboard() {
-      if(inputState != inputState.IDLE) {
-         logger.warning("Could not attach keyboard because state is '"+inputState+"' instead of IDLE.");
+   public void detachKeyboard() {
+      if(inputState != inputState.USING_KEYBOARD) {
+         logger.warning("Could not dettach keyboard because state is '"+
+                 inputState+"' instead of "+inputState.USING_KEYBOARD+".");
          return;
       }
 
-      
+
+
+      // Stop Broadcaster
+      broadcaster.shutdown();
+      broadcasterExec.shutdown();
+
+      // Wait for broadcaster to terminate
+      System.out.print("Waiting termination of Broadcaster...");
+      while(!broadcasterExec.isTerminated()) {
+         try {
+            Thread.sleep(100);
+         } catch (InterruptedException ex) {
+            logger.warning("Thread Interrupted 1.");
+            Thread.currentThread().interrupt();
+         }
+      }
+      System.out.println(" Terminated!");
+
+      // Detach keyboard listener
+      guiModel.detachKeyboard(keyboard);
+
+      // Stop Keyboard
+      arduinoEmu.shutdown();
+      messagesExec.shutdown();
+
+      // Wait for broadcaster to terminate
+      System.out.print("Waiting termination of Arduino Emulator...");
+      while(!messagesExec.isTerminated()) {
+         try {
+            Thread.sleep(100);
+         } catch (InterruptedException ex) {
+            logger.warning("Thread Interrupted 2.");
+            Thread.currentThread().interrupt();
+         }
+      }
+      System.out.println(" Terminated!");
+
+      // Change state
+      inputState = InputState.IDLE;
+   }
+
+   public void attachKeyboard() {
+      if(inputState != inputState.IDLE) {
+         logger.warning("Could not attach keyboard because state is '"+
+                 inputState+"' instead of "+inputState.IDLE+".");
+         return;
+      }
+
+      // Create KeyboardController
+      keyboard = new KeyController();
+
+      arduinoEmu = new ArduinoEmulator(keyboard.getKeyboadValuesReader(), periodInMillis);
+
+      broadcaster = new CommandBroadcaster(arduinoEmu.getReadChannel());
+      broadcaster.addListener(guiModel);
+
+      messagesExec = Executors.newSingleThreadExecutor();
+      broadcasterExec = Executors.newSingleThreadExecutor();
+
+      messagesExec.execute(arduinoEmu);
+      broadcasterExec.execute(broadcaster);
+
+      guiModel.attachKeyboard(keyboard);
+
+      // Change State
+      inputState = InputState.USING_KEYBOARD;
    }
 
    /**
