@@ -17,19 +17,20 @@
 
 package pt.ualg.carr.gui3;
 
+import pt.ualg.Car.Controller.ControllerMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import pt.ualg.Car.common.Concurrent.ReadChannel;
 
 /**
- * Sends Command objects to its Listeners.
+ * Sends ControllerMessage objects to its Listeners.
  *
  * @author Joao Bispo
  */
 public class CommandBroadcaster implements Runnable {
 
-   public CommandBroadcaster(ReadChannel<Command> channel) {
+   public CommandBroadcaster(ReadChannel<ControllerMessage> channel) {
       this.channel = channel;
       this.listeners = new ArrayList<ValuesListener>();
       this.run = true;
@@ -38,7 +39,7 @@ public class CommandBroadcaster implements Runnable {
    @Override
    public void run() {
       while(run) {
-         Command command = null;
+         ControllerMessage command = null;
 
          // Listen to the channel, and send the command everytime one arrives.
          try {            
@@ -76,7 +77,7 @@ public class CommandBroadcaster implements Runnable {
    /**
     * INSTANCE VARIABLES
     */
-   private ReadChannel<Command> channel;
+   private ReadChannel<ControllerMessage> channel;
    private List<ValuesListener> listeners;
    private boolean run;
 

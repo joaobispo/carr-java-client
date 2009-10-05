@@ -46,6 +46,7 @@ import pt.ualg.carr.gui2.MainScreen;
 import pt.ualg.carr.gui3.ArduinoEmulator;
 import pt.ualg.carr.gui3.GuiModel;
 import pt.ualg.carr.gui3.KeyController;
+import pt.ualg.carr.gui3.Launcher;
 
 /**
  *
@@ -368,29 +369,10 @@ String commPortName = "COM4";
    }
 
    private static void testGui3() {
-      long periodInMillis = 40;
+      long millisInPeriod = 40;
 
-      KeyController keyboard = new KeyController();
-
-      GuiModel guiModel = new GuiModel(Command.NUM_PORTS);
-      guiModel.init();
-      guiModel.attachKeyboard(keyboard);
-      
-
-
-      ArduinoEmulator arduino = new ArduinoEmulator(keyboard.getKeyboadValuesReader(), periodInMillis);
-
-      pt.ualg.carr.gui3.CommandBroadcaster broadcaster = new pt.ualg.carr.gui3.CommandBroadcaster(arduino.getReadChannel());
-      broadcaster.addListener(guiModel);
-      
-      //ReadChannel<pt.ualg.carr.gui3.Command> channel = arduino.getReadChannel();
-
-      ExecutorService arduinoExec = Executors.newSingleThreadExecutor();
-      ExecutorService broadcasterExec = Executors.newSingleThreadExecutor();
-      
-      arduinoExec.execute(arduino);
-      broadcasterExec.execute(broadcaster);
-
+      Launcher launcher = new Launcher(millisInPeriod);
+      launcher.execute();
       
        
    }

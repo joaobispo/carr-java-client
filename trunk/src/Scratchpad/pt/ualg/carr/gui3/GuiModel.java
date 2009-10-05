@@ -19,6 +19,7 @@ package pt.ualg.carr.gui3;
 
 import java.util.Arrays;
 import java.util.logging.Logger;
+import pt.ualg.Car.Controller.ControllerInput;
 import pt.ualg.Car.common.Concurrent.ReadChannel;
 import pt.ualg.Car.common.Concurrent.WriteChannel;
 import pt.ualg.Car.common.GuiUtils;
@@ -30,9 +31,10 @@ import pt.ualg.Car.common.GuiUtils;
  */
 public class GuiModel implements ValuesListener {
 
-   public GuiModel(int numPorts) {
+   public GuiModel() {
+      int numPorts = ControllerInput.values().length;
       portValues = new int[numPorts];
-      mainScreen = new MainScreen(numPorts);
+      mainScreen = new MainScreen();
       // Initialize Command Channel
       //int channelCapacity = 1;
       //keyboadValues = new WriteChannel<int[]>(channelCapacity);
@@ -68,6 +70,19 @@ public class GuiModel implements ValuesListener {
       }
       );
    }
+
+   public void detachKeyboard(final KeyController controller) {
+
+      // Attatch Keyboard Listener
+      GuiUtils.runOnEdt(new Runnable() {
+         @Override
+         public void run() {
+            mainScreen.detachKeyboard(controller);
+         }
+      }
+      );
+   }
+
 
    /**
     * If the channel is empty, put the current command there.
