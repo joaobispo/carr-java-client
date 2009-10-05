@@ -15,7 +15,7 @@
  *  under the License.
  */
 
-package pt.ualg.carr.gui3;
+package pt.ualg.Car.Controller;
 
 import java.util.Arrays;
 
@@ -26,15 +26,15 @@ import java.util.Arrays;
  *
  * @author Joao Bispo
  */
-public class Command {
+public class ControllerMessage {
 
    /**
-    * Creates a Command object.
+    * Creates a ControllerMessage object.
     *
     * @param counter
     * @param angles
     */
-   public Command(int[] angles) {
+   public ControllerMessage(int[] angles) {
       this.counter = newCounterValue();
       this.angles = Arrays.copyOf(angles, NUM_PORTS);
    }
@@ -83,11 +83,12 @@ public class Command {
     */
    private int counter;
    private final int[] angles;
-   public final static int NUM_PORTS = INPUT.values().length;
+   public final static int NUM_PORTS = ControllerInput.values().length;
    
    private static int globalCounter = 0;
 
 
+   /*
    public enum INPUT {
       WHEEL,
       TRIGGER,
@@ -95,5 +96,8 @@ public class Command {
       SWITCH2,
       SWITCH3,
       SWITCH4;
+
    }
+*/
+
 }

@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
+import pt.ualg.Car.Controller.ControllerInput;
 
 /**
  * Main screen of Car Client
@@ -32,8 +33,8 @@ import javax.swing.WindowConstants;
  */
 public class MainScreen {
 
-   public MainScreen(int numInputs) {
-      this.numInputs = numInputs;
+   public MainScreen() {
+      this.numInputs = ControllerInput.values().length;
 
    }
 
@@ -54,7 +55,8 @@ public class MainScreen {
       JPanel inputsPanel = new JPanel();
       inputsPanel.setLayout(new GridLayout(numInputs, 2));
       inputsPanel.setFocusable(false);
-      
+
+      ControllerInput[] portNames = ControllerInput.values();
       for(int i=0; i<numInputs; i++) {
          // Create JTextFields
          jTextFields[i] = new JTextField();
@@ -66,7 +68,8 @@ public class MainScreen {
          // Create JLabels
          jLabels[i] = new JLabel();
          // Setup JLabels
-         jLabels[i].setText(" Port "+(i+1));
+         String portName = portNames[i].getName();
+         jLabels[i].setText(" "+portName);
          jLabels[i].setFocusable(false);
          inputsPanel.add(jLabels[i]);
 
@@ -99,6 +102,10 @@ public class MainScreen {
             windowFrame.addKeyListener(controller);
             windowFrame.setFocusable(true);
             windowFrame.requestFocusInWindow();
+   }
+
+   public void detachKeyboard(KeyController controller) {
+            windowFrame.removeKeyListener(controller);
    }
 
    /**

@@ -21,10 +21,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.logging.Logger;
+import pt.ualg.Car.Controller.ControllerInput;
+import pt.ualg.Car.Controller.ControllerMessage;
 import pt.ualg.Car.common.Concurrent.ReadChannel;
 import pt.ualg.Car.common.Concurrent.WriteChannel;
 import pt.ualg.Car.common.GuiUtils;
-import pt.ualg.carr.gui3.Command.INPUT;
 
 /**
  * Emulates the Car Controller with the Keyboard.
@@ -34,9 +35,9 @@ import pt.ualg.carr.gui3.Command.INPUT;
 public class KeyController extends KeyAdapter {
 
    public KeyController() {
-      angles = new int[Command.NUM_PORTS];
+      angles = new int[ControllerMessage.NUM_PORTS];
 
-      // Initialize Command Channel
+      // Initialize ControllerMessage Channel
       int channelCapacity = 1;
       keyboadValues = new WriteChannel<int[]>(channelCapacity);
       sendValues();
@@ -52,7 +53,8 @@ public class KeyController extends KeyAdapter {
          @Override
          public void run() {
             int[] portValuesCopy = Arrays.copyOf(angles, angles.length);
-            boolean couldSend = keyboadValues.offer(portValuesCopy);
+            keyboadValues.offer(portValuesCopy);
+            //boolean couldSend = keyboadValues.offer(portValuesCopy);
             /*
             if(!couldSend) {
                logger.info("Keyboard Controller couldn't send values.");
@@ -78,12 +80,12 @@ public class KeyController extends KeyAdapter {
 
       switch(keyCode) {
          case KeyEvent.VK_Q:
-            changeAngle(INPUT.WHEEL, Direction.UP);
+            changeAngle(ControllerInput.WHEEL, Direction.UP);
             changes = true;
             break;
 
          case KeyEvent.VK_A:
-            changeAngle(INPUT.WHEEL, Direction.DOWN);
+            changeAngle(ControllerInput.WHEEL, Direction.DOWN);
             changes = true;
             break;
       }
@@ -101,7 +103,7 @@ public class KeyController extends KeyAdapter {
     * @param i
     * @param direction
     */
-   private void changeAngle(final INPUT input, final Direction direction) {
+   private void changeAngle(final ControllerInput input, final Direction direction) {
 
       // Run on the EDT so changes and reads to these values are sequencialized.
       GuiUtils.runOnEdt(new Runnable() {
@@ -135,7 +137,7 @@ public class KeyController extends KeyAdapter {
     * @param value
     * @param change
     */
-   private int calculateAngle(int value, int change, INPUT input) {
+   private int calculateAngle(int value, int change, ControllerInput input) {
       //TODO Implement rules here, and init values on Input
       int tempValue = value + change;
 

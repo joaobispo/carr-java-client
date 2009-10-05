@@ -17,6 +17,7 @@
 
 package pt.ualg.carr.gui3;
 
+import pt.ualg.Car.Controller.ControllerMessage;
 import java.util.logging.Logger;
 import pt.amaze.ASL.TimeUtils;
 import pt.ualg.Car.common.Concurrent.ReadChannel;
@@ -30,17 +31,17 @@ public class ArduinoEmulator implements Runnable {
 
    public ArduinoEmulator(ReadChannel<int[]> inputValues, long periodInMillis) {
       this.inputCommand = inputValues;
-      this.outputCommand = new WriteChannel<Command>(1);
+      this.outputCommand = new WriteChannel<ControllerMessage>(1);
       this.periodInMillis = periodInMillis;
       this.run = false;
-      this.lastValues = new int[Command.NUM_PORTS];
+      this.lastValues = new int[ControllerMessage.NUM_PORTS];
    }
 
    public void setWriteChannel(ReadChannel<int[]> writeChannel) {
       this.inputCommand = writeChannel;
    }
 
-   public ReadChannel<Command> getReadChannel() {
+   public ReadChannel<ControllerMessage> getReadChannel() {
       return outputCommand.getReadChannel();
    }
 
@@ -84,7 +85,7 @@ public class ArduinoEmulator implements Runnable {
       }
 
       // Try to put the command in the output queue
-      Command command = new Command(newValues);
+      ControllerMessage command = new ControllerMessage(newValues);
       boolean couldSend = outputCommand.offer(command);
       if (!couldSend) {
          logger.info("Arduino Emulator dropped command '" + command.getCounter() + "'.");
@@ -104,7 +105,7 @@ public class ArduinoEmulator implements Runnable {
     */
    // State
    private ReadChannel<int[]> inputCommand;
-   private WriteChannel<Command> outputCommand;
+   private WriteChannel<ControllerMessage> outputCommand;
    private long periodInMillis;
    private boolean run;
    private int[] lastValues;
