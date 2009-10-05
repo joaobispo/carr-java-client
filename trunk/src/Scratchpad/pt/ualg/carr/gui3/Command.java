@@ -83,8 +83,17 @@ public class Command {
     */
    private int counter;
    private final int[] angles;
-   public final static int NUM_PORTS = 6;
+   public final static int NUM_PORTS = INPUT.values().length;
    
    private static int globalCounter = 0;
 
+
+   public enum INPUT {
+      WHEEL,
+      TRIGGER,
+      SWITCH1,
+      SWITCH2,
+      SWITCH3,
+      SWITCH4;
+   }
 }
