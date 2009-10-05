@@ -53,18 +53,21 @@ public class MainScreen {
 
       JPanel inputsPanel = new JPanel();
       inputsPanel.setLayout(new GridLayout(numInputs, 2));
+      inputsPanel.setFocusable(false);
       
       for(int i=0; i<numInputs; i++) {
          // Create JTextFields
          jTextFields[i] = new JTextField();
          // Setup JTextFields
          jTextFields[i].setEditable(false);
+         jTextFields[i].setFocusable(false);
          inputsPanel.add(jTextFields[i]);
 
          // Create JLabels
          jLabels[i] = new JLabel();
          // Setup JLabels
          jLabels[i].setText(" Port "+(i+1));
+         jLabels[i].setFocusable(false);
          inputsPanel.add(jLabels[i]);
 
       }
@@ -92,6 +95,11 @@ public class MainScreen {
             }
    }
 
+   public void attachKeyboard(KeyController controller) {
+            windowFrame.addKeyListener(controller);
+            windowFrame.setFocusable(true);
+            windowFrame.requestFocusInWindow();
+   }
 
    /**
     * INSTANCE VARIABLES

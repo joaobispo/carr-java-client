@@ -23,7 +23,10 @@
 
 package pt.ualg.carr.gui;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
+import pt.ualg.Car.common.GuiUtils;
 import pt.ualg.carr.client1.Command;
 import pt.ualg.carr.client1.CommandListener;
 
@@ -61,6 +64,11 @@ public class MainWindow extends javax.swing.JFrame implements CommandListener {
       jLabel6 = new javax.swing.JLabel();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+      addKeyListener(new java.awt.event.KeyAdapter() {
+         public void keyTyped(java.awt.event.KeyEvent evt) {
+            formKeyTyped(evt);
+         }
+      });
 
       jTextField1.setEditable(false);
 
@@ -157,6 +165,11 @@ public class MainWindow extends javax.swing.JFrame implements CommandListener {
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
+    private void formKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyTyped
+       // TODO add your handling code here:
+       System.out.println("Typed");
+    }//GEN-LAST:event_formKeyTyped
+
     /**
     * @param args the command line arguments
     */
@@ -166,6 +179,24 @@ public class MainWindow extends javax.swing.JFrame implements CommandListener {
        JFrame mainWindow = new MainWindow();
     }
      */
+
+    public static void main(String[] args) {
+       // Anonymous Class
+       GuiUtils.runOnEdt(new Runnable() {
+         @Override
+            public void run() {
+                new MainWindow().setVisible(true);               
+            }
+       });
+
+      /*
+      try {
+         Thread.sleep(100000);
+      } catch (InterruptedException ex) {
+         Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+      }
+       */
+    }
 
     /*
     public static JFrame startGui() {
@@ -189,6 +220,7 @@ public class MainWindow extends javax.swing.JFrame implements CommandListener {
         return windowRunnable.mainWindow;
     }
      */
+     
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JLabel jLabel1;

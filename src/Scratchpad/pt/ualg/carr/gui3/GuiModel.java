@@ -34,9 +34,9 @@ public class GuiModel implements ValuesListener {
       portValues = new int[numPorts];
       mainScreen = new MainScreen(numPorts);
       // Initialize Command Channel
-      int channelCapacity = 1;
-      keyboadValues = new WriteChannel<int[]>(channelCapacity);
-      sendValues();
+      //int channelCapacity = 1;
+      //keyboadValues = new WriteChannel<int[]>(channelCapacity);
+      //sendValues();
    }
 
 
@@ -54,11 +54,25 @@ public class GuiModel implements ValuesListener {
          }
       }
       );
+      
+   }
+
+   public void attachKeyboard(final KeyController controller) {
+
+      // Attatch Keyboard Listener
+      GuiUtils.runOnEdt(new Runnable() {
+         @Override
+         public void run() {
+            mainScreen.attachKeyboard(controller);
+         }
+      }
+      );
    }
 
    /**
     * If the channel is empty, put the current command there.
     */
+   /*
    private void sendValues() {
       // Run on the EDT so changes and reads to these values are sequencialized.
       GuiUtils.runOnEdt(new Runnable() {
@@ -73,10 +87,13 @@ public class GuiModel implements ValuesListener {
          }
       });
    }
+    */
 
+   /*
    public ReadChannel<int[]> getKeyboadValuesReader() {
       return keyboadValues.getReadChannel();
    }
+    */
 
    @Override
    public void processValues(final int[] values) {
@@ -96,7 +113,7 @@ public class GuiModel implements ValuesListener {
     */
    // State
    private int[] portValues;
-   private WriteChannel<int[]> keyboadValues;
+   //private WriteChannel<int[]> keyboadValues;
 
    // Windows
    private MainScreen mainScreen;

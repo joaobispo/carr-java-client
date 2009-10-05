@@ -45,6 +45,7 @@ import pt.ualg.carr.gui2.MainProgram;
 import pt.ualg.carr.gui2.MainScreen;
 import pt.ualg.carr.gui3.ArduinoEmulator;
 import pt.ualg.carr.gui3.GuiModel;
+import pt.ualg.carr.gui3.KeyController;
 
 /**
  *
@@ -367,15 +368,17 @@ String commPortName = "COM4";
    }
 
    private static void testGui3() {
-      long periodInMillis = 500;
+      long periodInMillis = 40;
+
+      KeyController keyboard = new KeyController();
 
       GuiModel guiModel = new GuiModel(Command.NUM_PORTS);
       guiModel.init();
-
+      guiModel.attachKeyboard(keyboard);
       
 
 
-      ArduinoEmulator arduino = new ArduinoEmulator(guiModel.getKeyboadValuesReader(), periodInMillis);
+      ArduinoEmulator arduino = new ArduinoEmulator(keyboard.getKeyboadValuesReader(), periodInMillis);
 
       pt.ualg.carr.gui3.CommandBroadcaster broadcaster = new pt.ualg.carr.gui3.CommandBroadcaster(arduino.getReadChannel());
       broadcaster.addListener(guiModel);
