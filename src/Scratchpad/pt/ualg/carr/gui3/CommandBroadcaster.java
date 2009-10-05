@@ -32,7 +32,7 @@ public class CommandBroadcaster implements Runnable {
 
    public CommandBroadcaster(ReadChannel<ControllerMessage> channel) {
       this.channel = channel;
-      this.listeners = new ArrayList<ValuesListener>();
+      this.listeners = new ArrayList<ControllerMessageListener>();
       this.run = true;
    }
 
@@ -53,8 +53,8 @@ public class CommandBroadcaster implements Runnable {
 
          // Send the command to all listeners
          if(command != null) {
-            for(ValuesListener listener : listeners) {
-               listener.processValues(command.getAngles());
+            for(ControllerMessageListener listener : listeners) {
+               listener.processMessage(command);
             }
          }
 
@@ -66,7 +66,7 @@ public class CommandBroadcaster implements Runnable {
     *
     * @param listener
     */
-   public void addListener(ValuesListener listener) {
+   public void addListener(ControllerMessageListener listener) {
       listeners.add(listener);
    }
 
@@ -78,7 +78,7 @@ public class CommandBroadcaster implements Runnable {
     * INSTANCE VARIABLES
     */
    private ReadChannel<ControllerMessage> channel;
-   private List<ValuesListener> listeners;
+   private List<ControllerMessageListener> listeners;
    private boolean run;
 
    private Logger logger = Logger.getLogger(CommandBroadcaster.class.getName());

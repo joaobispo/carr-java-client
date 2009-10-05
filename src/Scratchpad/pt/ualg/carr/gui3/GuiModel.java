@@ -20,6 +20,7 @@ package pt.ualg.carr.gui3;
 import java.util.Arrays;
 import java.util.logging.Logger;
 import pt.ualg.Car.Controller.ControllerInput;
+import pt.ualg.Car.Controller.ControllerMessage;
 import pt.ualg.Car.common.Concurrent.ReadChannel;
 import pt.ualg.Car.common.Concurrent.WriteChannel;
 import pt.ualg.Car.common.GuiUtils;
@@ -29,7 +30,7 @@ import pt.ualg.Car.common.GuiUtils;
  *
  * @author Joao Bispo
  */
-public class GuiModel implements ValuesListener {
+public class GuiModel implements ControllerMessageListener {
 
    public GuiModel() {
       int numPorts = ControllerInput.values().length;
@@ -111,13 +112,13 @@ public class GuiModel implements ValuesListener {
     */
 
    @Override
-   public void processValues(final int[] values) {
+   public void processMessage(final ControllerMessage message) {
       // Run on the EDT so changes and reads to these values are sequencialized.
       GuiUtils.runOnEdt(new Runnable() {
 
          @Override
          public void run() {
-            mainScreen.updateTextFields(values);
+            mainScreen.updateTextFields(message.getAngles());
          }
       });
    }

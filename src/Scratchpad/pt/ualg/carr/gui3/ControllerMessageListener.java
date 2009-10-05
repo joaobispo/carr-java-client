@@ -17,13 +17,15 @@
 
 package pt.ualg.carr.gui3;
 
+import pt.ualg.Car.Controller.ControllerMessage;
+
 
 /**
  * Listed to incomming Command objects.
  *
  * @author Joao Bispo
  */
-public interface ValuesListener {
+public interface ControllerMessageListener {
 
-   public void processValues(int[] values);
+   public void processMessage(ControllerMessage message);
 }
