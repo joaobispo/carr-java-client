@@ -88,16 +88,4 @@ public class ControllerMessage {
    private static int globalCounter = 0;
 
 
-   /*
-   public enum INPUT {
-      WHEEL,
-      TRIGGER,
-      SWITCH1,
-      SWITCH2,
-      SWITCH3,
-      SWITCH4;
-
-   }
-*/
-
 }

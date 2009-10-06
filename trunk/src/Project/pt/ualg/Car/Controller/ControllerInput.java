@@ -18,7 +18,7 @@
 package pt.ualg.Car.Controller;
 
 /**
- *
+ * Has information about the inputs received from the controller for the car.
  * @author Joao Bispo
  */
 public enum ControllerInput {
