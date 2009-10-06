@@ -40,6 +40,7 @@ import pt.ualg.carr.client1.ListenerExample;
 import pt.ualg.carr.gui2.CommandBroadcaster;
 import pt.ualg.carr.gui.MainWindow;
 import pt.ualg.carr.gui2.CarpadController;
+import pt.ualg.carr.gui2.CommandToKeyboard;
 import pt.ualg.carr.gui2.KeyboardController;
 import pt.ualg.carr.gui2.MainProgram;
 import pt.ualg.carr.gui2.MainScreen;
@@ -68,7 +69,7 @@ public class TestMain {
 
        //testCarPadInput();
 
-        //testGui2();
+        testGui2();
 
        //testProgramV1();
        //testInputInterruption();
@@ -76,7 +77,7 @@ public class TestMain {
        // testControllerSerial();
       //testKeybController();
 
-        attachDetachKeyboard();
+        //attachDetachKeyboard();
     }
 
    public static void testSerialComm() {
@@ -205,6 +206,10 @@ String commPortName = "COM4";
       CommandBroadcaster signalGen = new CommandBroadcaster(channel);
       signalGen.addListener(mainScreen);
 
+      // Create "Robot"
+      CommandToKeyboard robot = new CommandToKeyboard();
+      signalGen.addListener(robot);
+
       // Create carPad
       //final CarPadInput carPad = new CarPadInput(channel, "COM4");
       final CarpadController carPad = new CarpadController("COM4", channel);
@@ -235,6 +240,7 @@ String commPortName = "COM4";
       });
        */
 
+      /*
       try {
          Thread.sleep(100000);
       } catch (InterruptedException ex) {
@@ -254,7 +260,7 @@ String commPortName = "COM4";
       while(!channel.isEmpty()) {
          channel.remove();
       }
-
+*/
    }
 
    private static void testProgramV1() {
