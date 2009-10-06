@@ -69,7 +69,7 @@ public class TestMain {
 
        //testCarPadInput();
 
-        testGui2();
+        //testGui2();
 
        //testProgramV1();
        //testInputInterruption();
@@ -78,6 +78,8 @@ public class TestMain {
       //testKeybController();
 
         //attachDetachKeyboard();
+
+        testGui3();
     }
 
    public static void testSerialComm() {
@@ -383,7 +385,7 @@ String commPortName = "COM4";
 
       long millisInPeriod = 40;
 
-      Launcher launcher = new Launcher(millisInPeriod);
+      Launcher launcher = new Launcher(millisInPeriod, "COM4");
       
       
       launcher.init();
@@ -413,6 +415,26 @@ String commPortName = "COM4";
 
        
        
+   }
+
+   private static void testGui3() {
+      long millisInPeriod = 40;
+
+      Launcher launcher = new Launcher(millisInPeriod, "COM4");
+
+      ExecutorService keybExecutor = Executors.newSingleThreadExecutor();
+      keybExecutor.execute(launcher);
+      
+
+      /*
+      launcher.init();
+
+      // From time to time, check if there is any problem
+      while(true) {
+         // Check if Carpad got disconnected
+         
+      }
+       */
    }
 
 }

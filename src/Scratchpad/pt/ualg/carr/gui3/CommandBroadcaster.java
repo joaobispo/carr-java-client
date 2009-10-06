@@ -20,6 +20,7 @@ package pt.ualg.carr.gui3;
 import pt.ualg.Car.Controller.ControllerMessage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import pt.ualg.Car.common.Concurrent.ReadChannel;
 
@@ -33,12 +34,30 @@ public class CommandBroadcaster implements Runnable {
    public CommandBroadcaster(ReadChannel<ControllerMessage> channel) {
       this.channel = channel;
       this.listeners = new ArrayList<ControllerMessageListener>();
-      this.run = true;
+      this.run = false;
+      receivedFirstMessage = false;
    }
+
+   public boolean hasReceivedFirstMessage() {
+      return receivedFirstMessage;
+   }
+
+
 
    @Override
    public void run() {
+      // Try to receive the first message
+      ControllerMessage command = null;
+      while(command == null) {
+         command = processCommand();
+      }
+
+      receivedFirstMessage = true;
+
+      run = true;
       while(run) {
+         processCommand();
+         /*
          ControllerMessage command = null;
 
          // Listen to the channel, and send the command everytime one arrives.
@@ -57,8 +76,32 @@ public class CommandBroadcaster implements Runnable {
                listener.processMessage(command);
             }
          }
-
+*/
       }
+   }
+
+
+   private ControllerMessage processCommand() {
+         ControllerMessage command = null;
+
+         // Listen to the channel, and send the command everytime one arrives.
+         try {
+            command = channel.poll(readTimeoutInMillis, TimeUnit.MILLISECONDS);
+         } catch (InterruptedException ex) {
+            if(run) {
+               logger.warning("Thread was interrupted without shuting down CommandBroadcaster first.");
+            }
+            Thread.currentThread().interrupt();
+         }
+
+         // Send the command to all listeners
+         if(command != null) {
+            for(ControllerMessageListener listener : listeners) {
+               listener.processMessage(command);
+            }
+         }
+
+         return command;
    }
 
    /**
@@ -80,7 +123,11 @@ public class CommandBroadcaster implements Runnable {
    private ReadChannel<ControllerMessage> channel;
    private List<ControllerMessageListener> listeners;
    private boolean run;
+   private boolean receivedFirstMessage;
+
+   private static final long readTimeoutInMillis = 1000;
 
    private Logger logger = Logger.getLogger(CommandBroadcaster.class.getName());
+
 
 }
