@@ -21,16 +21,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import pt.ualg.Car.Controller.CarpadController;
 
 /**
  *
  * @author Joao Bispo
  */
-public class Launcher {
+public class Launcher implements Runnable {
 
-   public Launcher(long periodInMillis) {
+   public Launcher(long periodInMillis, String carpadPortName) {
       this.periodInMillis = periodInMillis;
+      this.carpadPortName = carpadPortName;
       inputState = InputState.IDLE;
+      carpadGotDisconnected = false;
    }
 
    /**
@@ -41,7 +44,46 @@ public class Launcher {
       guiModel = new GuiModel();
       guiModel.init();
 
+      //attachCarpad();
+      //detachCarpad();
       //attachKeyboard();
+      /*
+      messagesExec = Executors.newSingleThreadExecutor();
+      messagesExec.execute(new CarpadController());
+      messagesExec.execute(new Runnable() {
+
+         @Override
+         public void run() {
+            logger.info("Carpad Controller got disconnected. Returning to keyboard");
+         }
+
+      });
+       */
+   }
+
+
+   @Override
+   public void run() {
+      init();
+      attachCarpad();
+
+      // From time to time, check if there is any problem
+      while(true) {
+         // Check if Carpad got disconnected
+         if(carpadGotDisconnected) {
+            System.out.println("Reconnecting to keyboard...");
+            detachCarpad();
+            attachKeyboard();
+            carpadGotDisconnected = false;
+            System.out.println("Successful!");
+         }
+
+         try {
+            Thread.sleep(LONG_SLEEP_WAIT);
+         } catch (InterruptedException ex) {
+            logger.warning("Thread Interrupted.");
+         }
+      }
    }
 
    /**
@@ -96,7 +138,7 @@ public class Launcher {
       System.out.print("Waiting termination of Broadcaster...");
       while(!broadcasterExec.isTerminated()) {
          try {
-            Thread.sleep(100);
+            Thread.sleep(SLEEP_WAIT);
          } catch (InterruptedException ex) {
             logger.warning("Thread Interrupted 1.");
             Thread.currentThread().interrupt();
@@ -115,7 +157,7 @@ public class Launcher {
       System.out.print("Waiting termination of Arduino Emulator...");
       while(!messagesExec.isTerminated()) {
          try {
-            Thread.sleep(100);
+            Thread.sleep(SLEEP_WAIT);
          } catch (InterruptedException ex) {
             logger.warning("Thread Interrupted 2.");
             Thread.currentThread().interrupt();
@@ -145,8 +187,9 @@ public class Launcher {
       messagesExec = Executors.newSingleThreadExecutor();
       broadcasterExec = Executors.newSingleThreadExecutor();
 
-      messagesExec.execute(arduinoEmu);
+      
       broadcasterExec.execute(broadcaster);
+      messagesExec.execute(arduinoEmu);
 
       guiModel.attachKeyboard(keyboard);
 
@@ -154,12 +197,122 @@ public class Launcher {
       inputState = InputState.USING_KEYBOARD;
    }
 
+   public void attachCarpad() {
+      if(inputState != inputState.IDLE) {
+         logger.warning("Could not attach carpad because state is '"+
+                 inputState+"' instead of "+inputState.IDLE+".");
+         return;
+      }
+
+      // Create CarpadController
+      carpad = new CarpadController(carpadPortName);
+
+      // Create Broacaster and connect to Carpad Controller
+      broadcaster = new CommandBroadcaster(carpad.getReadChannel());
+      // Add GUI as a listener
+      broadcaster.addListener(guiModel);
+
+      // Create Executors
+      messagesExec = Executors.newSingleThreadExecutor();
+      broadcasterExec = Executors.newSingleThreadExecutor();
+
+      // Launch threads
+      broadcasterExec.execute(broadcaster);
+      
+      messagesExec.execute(carpad);
+      // Add code in case the connection to carpad terminates
+     
+      messagesExec.execute(new Runnable() {
+
+         @Override
+         public void run() {
+            // Check state
+            if(inputState == InputState.WHILE_DISCONNECTING_CARPAD) {
+               return;
+            }
+
+            logger.info("Carpad Controller got disconnected.");
+            carpadGotDisconnected = true;
+         }
+
+      });
+      
+      
+      // Wait for first message of broadcaster
+      while (!broadcaster.hasReceivedFirstMessage()) {
+         try {
+            Thread.sleep(SLEEP_WAIT);
+         } catch (InterruptedException ex) {
+            logger.warning("Thread Interrupted 1.");
+            Thread.currentThread().interrupt();
+         }
+      }
+
+      // Change State
+      inputState = InputState.USING_CARPAD;
+   }
+
+   public void detachCarpad() {
+      if(inputState != inputState.USING_CARPAD) {
+         logger.warning("Could not detach Carpad because state is '"+
+                 inputState+"' instead of "+inputState.USING_CARPAD+".");
+         return;
+      }
+
+      inputState = InputState.WHILE_DISCONNECTING_CARPAD;
+
+      // Stop Carpad Controller
+      carpad.shutdown();
+      messagesExec.shutdown();
+
+      // Wait for Carpad Controller to terminate
+      System.out.print("Finishing communication with Carpad Controller...");
+      while(!messagesExec.isTerminated()) {
+         try {
+            Thread.sleep(SLEEP_WAIT);
+         } catch (InterruptedException ex) {
+            logger.warning("Thread Interrupted 2.");
+            Thread.currentThread().interrupt();
+         }
+      }
+      System.out.println(" Terminated!");
+
+      // Stop Broadcaster
+      broadcaster.shutdown();
+      broadcasterExec.shutdown();
+
+      // Wait for broadcaster to terminate
+      System.out.print("Waiting termination of Broadcaster...");
+      while(!broadcasterExec.isTerminated()) {
+         try {
+            Thread.sleep(SLEEP_WAIT);
+         } catch (InterruptedException ex) {
+            logger.warning("Thread Interrupted 1.");
+            Thread.currentThread().interrupt();
+         }
+      }
+      System.out.println(" Terminated!");
+
+      
+
+      // Change state
+      inputState = InputState.IDLE;
+   }
+
+
    /**
     * INSTANCE VARIABLES
     */
    // State
    private long periodInMillis;
+   private String carpadPortName;
    private InputState inputState;
+
+   private final static long SLEEP_WAIT = 100;
+   private final static long LONG_SLEEP_WAIT = 1000;
+
+   // Carpad controller
+   private CarpadController carpad;
 
    // Keyboard controller
    private KeyController keyboard;
@@ -182,9 +335,14 @@ public class Launcher {
    // Utils
    private Logger logger = Logger.getLogger(Launcher.class.getName());
 
+   // Error During Runtime
+   private boolean carpadGotDisconnected;
+
+
    enum InputState {
       USING_KEYBOARD,
       USING_CARPAD,
+      WHILE_DISCONNECTING_CARPAD,
       IDLE;
 
       @Override

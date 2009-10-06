@@ -34,7 +34,11 @@ public enum ControllerInput {
    }
 
    public String getName() {
-      return name;
+      return this.name;
+   }
+
+   public static int numberOfInputs() {
+      return values().length;
    }
 
       /**

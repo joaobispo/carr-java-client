@@ -18,6 +18,7 @@
 package pt.ualg.Car.common.Concurrent;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -37,6 +38,21 @@ public class ReadChannel<T> {
     */
    public T poll() {
       return channel.poll();
+   }
+
+   /**
+    * Retrieves and removes the head of this queue,
+    * waiting up to the specified wait time if necessary
+    * for an element to become available.
+    *
+    * @param timeout how long to wait before giving up, in units of unit
+    * @param unit a TimeUnit determining how to interpret the timeout parameter
+    * @return the head of this queue, or null if the specified waiting time
+    * elapses before an element is available
+    * @throws InterruptedException if interrupted while waiting
+    */
+   public T poll(long timeout, TimeUnit unit) throws InterruptedException {
+      return channel.poll(timeout, unit);
    }
 
    /**
