@@ -19,9 +19,9 @@ package pt.ualg.carr.gui3;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import pt.ualg.Car.Controller.CarpadController;
+import pt.ualg.Car.System.CommandBroadcaster;
 
 /**
  *
@@ -110,7 +110,7 @@ public class Launcher implements Runnable {
 
       arduinoEmu = new ArduinoEmulator(keyboard.getKeyboadValuesReader(), periodInMillis);
 
-      broadcaster = new pt.ualg.carr.gui3.CommandBroadcaster(arduinoEmu.getReadChannel());
+      broadcaster = new pt.ualg.Car.System.CommandBroadcaster(arduinoEmu.getReadChannel());
       broadcaster.addListener(guiModel);
 
 

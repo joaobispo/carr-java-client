@@ -1,5 +1,5 @@
 /*
- *  Copyright 2009 Ancora Research Group.
+ *  Copyright 2009 Abstract Maze.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,38 +14,36 @@
  *  limitations under the License.
  *  under the License.
  */
+package pt.ualg.Car.JavaDriver.System;
 
-package pt.ualg.Car.Controller;
+import pt.ualg.Car.Controller.ControllerInput;
 
 /**
- * Has information about the inputs received from the controller for the car.
+ *
  * @author Joao Bispo
  */
-public enum ControllerInput {
-      SWITCH1("Analog 1"),
-      SWITCH2("Analog 2"),
-      SWITCH3("Analog 3"),
-      SWITCH4("Analog 4"),
-      WHEEL("Wheel"),
-      TRIGGER("Trigger");
+public enum JavaDriverInput {
 
-   private ControllerInput(String name) {
-      this.name = name;
+   WHEEL(ControllerInput.WHEEL),
+   TRIGGER(ControllerInput.TRIGGER);
+
+   private JavaDriverInput(ControllerInput controllerInput) {
+      this.controllerInput = controllerInput;
    }
 
    public String getName() {
-      return this.name;
+      return controllerInput.getName();
+   }
+
+   public int getControllerInputIndex() {
+      return controllerInput.ordinal();
    }
 
    public static int numberOfInputs() {
       return values().length;
    }
-
-      /**
-       * INSTANCE VARIABLES
-       */
-      private final String name;
-
-      // Signal sent by CarPad indicating start of a package.
-      public static final int COMMAND_START = 255;
+   /**
+    * INSTANCE VARIABLES
+    */
+   private final ControllerInput controllerInput;
 }

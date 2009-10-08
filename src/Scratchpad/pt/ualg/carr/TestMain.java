@@ -33,6 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import pt.amaze.ASL.LoggingUtils;
+import pt.ualg.Car.JavaDriver.Main;
 import pt.ualg.Car.common.Concurrent.ReadChannel;
 import pt.ualg.carr.client1.CarPadInput;
 import pt.ualg.carr.client1.Command;
@@ -79,7 +80,8 @@ public class TestMain {
 
         //attachDetachKeyboard();
 
-        testGui3();
+        //testGui3();
+        testJavaDriver();
     }
 
    public static void testSerialComm() {
@@ -435,6 +437,15 @@ String commPortName = "COM4";
          
       }
        */
+   }
+
+   private static void testJavaDriver() {
+      long millisInPeriod = 40;
+
+      Main main = new Main(millisInPeriod, "COM4");
+
+      ExecutorService keybExecutor = Executors.newSingleThreadExecutor();
+      keybExecutor.execute(main);
    }
 
 }
