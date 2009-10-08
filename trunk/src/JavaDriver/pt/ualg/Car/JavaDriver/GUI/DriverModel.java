@@ -17,17 +17,19 @@
 
 package pt.ualg.Car.JavaDriver.GUI;
 
-import pt.ualg.Car.JavaDriver.System.JavaDriverInput;
+import pt.ualg.Car.Controller.ControllerMessage;
+import pt.ualg.Car.JavaDriver.System.DriverInput;
 import pt.ualg.Car.common.GuiUtils;
+import pt.ualg.carr.gui3.ControllerMessageListener;
 
 /**
  *
  * @author Joao Bispo
  */
-public class DriverModel {
+public class DriverModel implements ControllerMessageListener {
 
    public DriverModel() {
-      int numPorts = JavaDriverInput.numberOfInputs();
+      int numPorts = DriverInput.numberOfInputs();
       driverScreen = new DriverScreen();
    }
 
@@ -46,6 +48,22 @@ public class DriverModel {
       );
 
    }
+   
+   @Override
+   public void processMessage(final ControllerMessage message) {
+      // Run on the EDT so changes and reads to these values are sequencialized.
+      GuiUtils.runOnEdt(new Runnable() {
+
+         @Override
+         public void run() {
+            int[] angles = message.getAngles();
+            int wheelAngle = angles[DriverInput.WHEEL.getControllerInputIndex()];
+            int triggerAngle = angles[DriverInput.TRIGGER.getControllerInputIndex()];
+            driverScreen.updateInputs(wheelAngle, triggerAngle);
+         }
+      });
+   }
+
 
    public void updateDriverScreenMessage(final String message) {
       GuiUtils.runOnEdt(new Runnable() {
@@ -54,6 +72,33 @@ public class DriverModel {
             driverScreen.updateConnectionMessage(message);
          }
 
+      });
+   }
+
+   public void activateConnectButton(final boolean b) {
+      GuiUtils.runOnEdt(new Runnable() {
+         @Override
+         public void run() {
+            driverScreen.activateConnectButton(b);
+         }
+      });
+   }
+
+   public void setConnectButtonText(final String text) {
+       GuiUtils.runOnEdt(new Runnable() {
+         @Override
+         public void run() {
+            driverScreen.setConnectButtonText(text);
+         }
+      });
+   }
+
+   public void addListener(final GuiListener listener) {
+       GuiUtils.runOnEdt(new Runnable() {
+         @Override
+         public void run() {
+            driverScreen.addListener(listener);
+         }
       });
    }
 
@@ -66,4 +111,7 @@ public class DriverModel {
 
    // Windows
    private DriverScreen driverScreen;
+
+
+
 }

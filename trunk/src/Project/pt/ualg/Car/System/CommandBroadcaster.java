@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import pt.amaze.ASL.TimeUtils;
 import pt.ualg.Car.common.Concurrent.ReadChannel;
 
 /**
@@ -37,6 +38,35 @@ public class CommandBroadcaster implements Runnable {
       this.listeners = new ArrayList<ControllerMessageListener>();
       this.run = false;
       receivedFirstMessage = false;
+   }
+
+   /**
+    * Returns true if it has received the first message. If it has not already,
+    * waits for a time, and if it timeouts, returns false.
+    *
+    * @param timeout
+    * @return
+    */
+   public boolean waitForFirstMessage(long timeoutMillis) {
+      long SLEEP_WAIT = 100;
+      long startTimeNanos = System.nanoTime();
+      long timeoutNanos = TimeUtils.millisToNanos(timeoutMillis);
+
+      while (!hasReceivedFirstMessage()) {
+         long timePassed = System.nanoTime() - startTimeNanos;
+         if(timePassed > timeoutNanos) {
+            return false;
+         }
+
+         try {
+            Thread.sleep(SLEEP_WAIT);
+         } catch (InterruptedException ex) {
+            logger.warning("Thread Interrupted 1.");
+            Thread.currentThread().interrupt();
+         }
+      }
+      
+      return true;
    }
 
    public boolean hasReceivedFirstMessage() {

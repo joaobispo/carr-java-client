@@ -14,36 +14,16 @@
  *  limitations under the License.
  *  under the License.
  */
-package pt.ualg.Car.JavaDriver.System;
 
-import pt.ualg.Car.Controller.ControllerInput;
+package pt.ualg.Car.Controller;
 
 /**
  *
  * @author Joao Bispo
  */
-public enum JavaDriverInput {
-
-   WHEEL(ControllerInput.WHEEL),
-   TRIGGER(ControllerInput.TRIGGER);
-
-   private JavaDriverInput(ControllerInput controllerInput) {
-      this.controllerInput = controllerInput;
-   }
-
-   public String getName() {
-      return controllerInput.getName();
-   }
-
-   public int getControllerInputIndex() {
-      return controllerInput.ordinal();
-   }
-
-   public static int numberOfInputs() {
-      return values().length;
-   }
-   /**
-    * INSTANCE VARIABLES
-    */
-   private final ControllerInput controllerInput;
+public enum CarpadState {
+      INITIALIZING,
+      RUNNING,
+      TERMINATED;
+   
 }
