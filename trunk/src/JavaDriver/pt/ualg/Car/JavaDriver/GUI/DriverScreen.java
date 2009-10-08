@@ -17,11 +17,13 @@
 
 package pt.ualg.Car.JavaDriver.GUI;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import javax.swing.BorderFactory;
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -50,15 +52,29 @@ public class DriverScreen {
    public void initComponents() {
       windowFrame = new JFrame();
 
-      // Build Inputs Panel
-      JPanel inputsPanel = buildInputsPanel();
+      buildInputsComponents();
+      buildConfigComponents();
+      buildConnectComponents();
 
-      JPanel connectPanel = buildConnectPanel();
+      // Build Inputs Panel
+      //JPanel inputsPanel = buildInputsPanel();
+
+      //JPanel connectPanel = buildConnectPanel();
 
       JPanel configPanel = buildConfigPanel();
 
-      buildJFrameBagLayout(configPanel);
+      JPanel inputsAndConfig = buildJFrameBagLayout(configPanel);
       //buildJFrameGridLayout(inputsPanel, connectPanel);
+
+      JPanel driverPanel = new JPanel();
+      driverPanel.setLayout(new BorderLayout());
+      driverPanel.setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
+      driverPanel.add(inputsAndConfig, BorderLayout.CENTER);
+      
+      driverPanel.add(connectionStatus, BorderLayout.SOUTH);
+
+
+      windowFrame.add(driverPanel);
 
       windowFrame.setTitle("Carpad Driver");
       windowFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -119,17 +135,12 @@ public class DriverScreen {
    private JPanel buildConfigPanel() {
       //... Create an independent GridLayout panel of buttons.
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(2, 1, GAP, GAP));
+        buttonPanel.setLayout(new GridLayout(3, 1, GAP, GAP));
 
-        calibrateButton = new JButton("Calibrate");
         buttonPanel.add(calibrateButton);
-        configButton = new JButton("Redefine Keys");
         buttonPanel.add(configButton);
+        buttonPanel.add(connectButton);
 
-
-        //connectButton = new JButton("Connect");
-        //connectButton.setEnabled(false);
-        //buttonPanel.add(connectButton);
 
         return buttonPanel;
    }
@@ -148,6 +159,9 @@ public class DriverScreen {
       content.add(inputTextFields[0], pos.nextCol()); // 3rd col
 
       content.add(new Gap(GAP), pos.nextCol()); // 4th col
+
+      //content.add(calibrateButton, pos.nextCol()); // 5th col
+
       content.add(configPanel, pos.nextCol().height(5).align(GridBagConstraints.NORTH)); // 5th col
 
       //content.add(new Gap(GAP) , pos.nextRow());  // Add a gap below
@@ -156,6 +170,12 @@ public class DriverScreen {
       content.add(inputLabels[1], pos.nextRow());
       content.add(new Gap(GAP), pos.nextCol()); // 2nd col
       content.add(inputTextFields[1], pos.nextCol()); // 3rd col
+      //      content.add(new Gap(GAP), pos.nextCol()); // 4th col
+
+      //content.add(configButton, pos.nextCol()); // 5th col
+
+      content.add(new Gap(2*GAP), pos.nextRow());
+
 
       
 
@@ -190,7 +210,6 @@ public class DriverScreen {
 
 
         
-        windowFrame.add(content);
         return content;
    }
 
@@ -206,6 +225,46 @@ public class DriverScreen {
       windowFrame.add(connectPanel);
    }
 
+   private void buildInputsComponents() {
+
+      inputLabels = new JLabel[numInputs];
+      inputTextFields = new JTextField[numInputs];
+
+      JavaDriverInput[] portNames = JavaDriverInput.values();
+      for (int i = 0; i < numInputs; i++) {
+
+         // Create JLabels
+         inputLabels[i] = new JLabel();
+         // Setup JLabels
+         String portName = portNames[i].getName();
+         inputLabels[i].setText(portName+":");
+         inputLabels[i].setHorizontalAlignment(JTextField.LEFT);
+
+         // Create JTextFields
+         inputTextFields[i] = new JTextField(5);
+         // Setup JTextFields
+         inputTextFields[i].setEditable(false);
+         inputTextFields[i].setHorizontalAlignment(JTextField.LEFT);
+      }
+   }
+
+
+   private void buildConfigComponents() {
+                    
+      calibrateButton = new JButton("Calibrate");
+      configButton = new JButton("Redefine Keys");
+   }
+
+
+   private void buildConnectComponents() {
+      connectButton = new JButton("Connect");
+      connectButton.setEnabled(false);
+
+     connectionStatus = new JTextField("Initializing...", 20);
+     connectionStatus.setEditable(false);
+     connectionStatus.setHorizontalAlignment(JTextField.CENTER);
+     connectionStatus.setMinimumSize(new Dimension(100, 40));
+   }
 
    public void updateConnectionMessage(String message) {
       connectionStatus.setText(message);
@@ -233,6 +292,12 @@ public class DriverScreen {
 
 
 
+   }
 
 
-}
+
+
+
+
+
+
