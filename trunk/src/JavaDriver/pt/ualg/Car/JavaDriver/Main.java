@@ -47,7 +47,7 @@ public class Main implements Runnable {
 
 
       // Look for controller in the given port
-      updateDriverScreenMessage("Trying to connect to port ["+carpadPortName+"]...");
+      driverModel.updateDriverScreenMessage("Trying to connect to port ["+carpadPortName+"]...");
       boolean isInPort = CarpadController.testPort(carpadPortName);
 
       if(!isInPort) {
@@ -60,10 +60,10 @@ public class Main implements Runnable {
 
       if(carpad == null) {
          mainState = MainState.DISCONNECTED;
-         updateDriverScreenMessage("Could not connect.");
+         driverModel.updateDriverScreenMessage("Could not connect.");
       } else {
          mainState = MainState.CONNECTED;
-         updateDriverScreenMessage("Connect at port ["+carpadPortName+"]!");
+         driverModel.updateDriverScreenMessage("Connect at port ["+carpadPortName+"]!");
       }
 
    }
@@ -80,7 +80,7 @@ public class Main implements Runnable {
 
       for(int i=0; i<numPorts; i++) {
          String testPort = serialPorts.get(i);
-         updateDriverScreenMessage("("+(i+1)+"/"+(numPorts)+") " +
+         driverModel.updateDriverScreenMessage("("+(i+1)+"/"+(numPorts)+") " +
                  "Looking at port ["+testPort+"]...");
          boolean isPortConnectable = CarpadController.testPort(testPort);
 
@@ -92,18 +92,6 @@ public class Main implements Runnable {
       return carpadPort;
    }
 
-   public void updateDriverScreenMessage(final String message) {
-      GuiUtils.runOnEdt(new Runnable() {
-
-         @Override
-         public void run() {
-            // TODO - Write message to screen
-            //throw new UnsupportedOperationException("Not supported yet.");
-            System.out.println(message);
-         }
-
-      });
-   }
 
 
    /**

@@ -47,6 +47,16 @@ public class DriverModel {
 
    }
 
+   public void updateDriverScreenMessage(final String message) {
+      GuiUtils.runOnEdt(new Runnable() {
+         @Override
+         public void run() {
+            driverScreen.updateConnectionMessage(message);
+         }
+
+      });
+   }
+
    /**
     * INSTANCE VARIABLES
     */
