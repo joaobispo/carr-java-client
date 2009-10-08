@@ -15,8 +15,9 @@
  *  under the License.
  */
 
-package pt.ualg.carr.gui3;
+package pt.ualg.Car.System;
 
+import pt.ualg.carr.gui3.*;
 import pt.ualg.Car.Controller.ControllerMessage;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,37 +47,21 @@ public class CommandBroadcaster implements Runnable {
 
    @Override
    public void run() {
+      run = true;
+
       // Try to receive the first message
       ControllerMessage command = null;
-      while(command == null) {
+      boolean isCommandNull = command == null;
+      while(isCommandNull & run) {
          command = processCommand();
+         isCommandNull = command == null;
       }
 
       receivedFirstMessage = true;
 
-      run = true;
+      
       while(run) {
          processCommand();
-         /*
-         ControllerMessage command = null;
-
-         // Listen to the channel, and send the command everytime one arrives.
-         try {            
-            command = channel.take();
-         } catch (InterruptedException ex) {
-            if(run) {
-               logger.warning("Thread was interrupted without shuting down CommandBroadcaster first.");
-            }
-            Thread.currentThread().interrupt();
-         }
-
-         // Send the command to all listeners
-         if(command != null) {
-            for(ControllerMessageListener listener : listeners) {
-               listener.processMessage(command);
-            }
-         }
-*/
       }
    }
 

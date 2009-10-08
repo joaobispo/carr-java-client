@@ -17,12 +17,9 @@
 
 package pt.ualg.carr.gui3;
 
-import java.util.Arrays;
 import java.util.logging.Logger;
 import pt.ualg.Car.Controller.ControllerInput;
 import pt.ualg.Car.Controller.ControllerMessage;
-import pt.ualg.Car.common.Concurrent.ReadChannel;
-import pt.ualg.Car.common.Concurrent.WriteChannel;
 import pt.ualg.Car.common.GuiUtils;
 
 
@@ -118,7 +115,8 @@ public class GuiModel implements ControllerMessageListener {
 
          @Override
          public void run() {
-            mainScreen.updateTextFields(message.getAngles());
+            portValues = message.getAngles();
+            mainScreen.updateTextFields(portValues);
          }
       });
    }

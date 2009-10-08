@@ -5,6 +5,7 @@
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
             <name>Aldric's Carr</name>
             <source-roots>
+                <root id="src.JavaDriver.dir" name="JavaDriver"/>
                 <root id="src.dir" name="Client Source"/>
                 <root id="Scratchpad.dir" name="Scratchpad"/>
             </source-roots>
