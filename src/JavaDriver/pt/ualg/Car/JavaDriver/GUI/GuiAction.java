@@ -15,15 +15,13 @@
  *  under the License.
  */
 
-package pt.ualg.Car.JavaDriver;
+package pt.ualg.Car.JavaDriver.GUI;
 
 /**
  *
  * @author Joao Bispo
  */
-public enum MainState {
-   CONNECTED,
-   DISCONNECTED,
-   WHILE_DISCONNECTING,
-   WHILE_CONNECTING;
+public enum GuiAction {
+
+   CONNECT_BUTTON;
 }

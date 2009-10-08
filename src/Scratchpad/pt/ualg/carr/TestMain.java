@@ -442,7 +442,7 @@ String commPortName = "COM4";
    private static void testJavaDriver() {
       long millisInPeriod = 40;
 
-      Main main = new Main(millisInPeriod, "COM4");
+      Main main = new Main("COM5");
 
       ExecutorService keybExecutor = Executors.newSingleThreadExecutor();
       keybExecutor.execute(main);

@@ -58,6 +58,7 @@ public class CarpadController implements Runnable {
       final int channelCapacity = 1;
       this.channel = new WriteChannel<ControllerMessage>(channelCapacity);
       run = false;
+      state = CarpadState.INITIALIZING;
    }
 
 
@@ -66,9 +67,39 @@ public class CarpadController implements Runnable {
    }
 
 
+   /**
+    * Blocks until Carpad Controller has initialized.
+    * <p> Warning: This method can only be called after Carpad is running,
+    * or else it will block forever.
+    */
+   public void waitInitialization() {
+      // Removed this piece of code because we could issue a carpad object
+      // to a thread, and this method be called first.
+      /*
+      if(state == null) {
+         logger.warning("Carpad is not running yet!");
+         return;
+      }
+       */
+
+      long SLEEP_WAIT = 100;
+
+
+      while (state == CarpadState.INITIALIZING) {
+         try {
+            Thread.sleep(SLEEP_WAIT);
+         } catch (InterruptedException ex) {
+            logger.warning("Thread Interrupted 1.");
+            Thread.currentThread().interrupt();
+         }
+      }
+
+   }
+
    @Override  
    public void run() {
-
+      state = CarpadState.INITIALIZING;
+      
       // Test if CarPad is connect to port
       boolean isConnected = testPort(commPortName);
 
@@ -80,6 +111,7 @@ public class CarpadController implements Runnable {
       // Test again for null, commPortName could have been not found
       if(commPortName == null) {
          //logger.warning("Could not found CarPad.");
+         state = CarpadState.TERMINATED;
          return;
       }
 
@@ -90,6 +122,7 @@ public class CarpadController implements Runnable {
       if(serialPort == null) {
          logger.warning("Could not connect to serial port '"+commPortName+"'.");
          run = false;
+         state = CarpadState.TERMINATED;
          return;
       }
       // From this moment on, the serial port is connect. Before exiting the
@@ -102,7 +135,7 @@ public class CarpadController implements Runnable {
 
          // Create InputStream
          inputStream = serialPort.getInputStream();
-
+         state = CarpadState.RUNNING;
          // Read input stream as fast as it can
          while (run) {
             int readInt = inputStream.read();
@@ -133,6 +166,8 @@ public class CarpadController implements Runnable {
       // Close Serial Port
       serialPort.close();
       serialPort = null;
+      
+      state = CarpadState.TERMINATED;
    }
 
     /**
@@ -397,6 +432,10 @@ public class CarpadController implements Runnable {
       
    }
 
+   public CarpadState getState() {
+      return state;
+   }
+
 
    /**
     * INSTANCE VARIABLES
@@ -418,9 +457,7 @@ public class CarpadController implements Runnable {
    // Channel to where the commands will be sent.
    private WriteChannel<ControllerMessage> channel;
 
-
-
-
+   private CarpadState state;
 
 
 }

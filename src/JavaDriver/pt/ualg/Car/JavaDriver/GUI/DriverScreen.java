@@ -22,6 +22,10 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -30,7 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
-import pt.ualg.Car.JavaDriver.System.JavaDriverInput;
+import pt.ualg.Car.JavaDriver.System.DriverInput;
 
 /**
  *
@@ -39,7 +43,8 @@ import pt.ualg.Car.JavaDriver.System.JavaDriverInput;
 public class DriverScreen {
 
    public DriverScreen() {
-      numInputs = JavaDriverInput.numberOfInputs();
+      numInputs = DriverInput.numberOfInputs();
+      listeners = new ArrayList<GuiListener>();
    }
 
    public JFrame getWindowFrame() {
@@ -89,7 +94,7 @@ public class DriverScreen {
       inputLabels = new JLabel[numInputs];
       inputTextFields = new JTextField[numInputs];
 
-      JavaDriverInput[] portNames = JavaDriverInput.values();
+      DriverInput[] portNames = DriverInput.values();
       for (int i = 0; i < numInputs; i++) {
 
          // Create JLabels
@@ -230,7 +235,7 @@ public class DriverScreen {
       inputLabels = new JLabel[numInputs];
       inputTextFields = new JTextField[numInputs];
 
-      JavaDriverInput[] portNames = JavaDriverInput.values();
+      DriverInput[] portNames = DriverInput.values();
       for (int i = 0; i < numInputs; i++) {
 
          // Create JLabels
@@ -252,13 +257,24 @@ public class DriverScreen {
    private void buildConfigComponents() {
                     
       calibrateButton = new JButton("Calibrate");
+      calibrateButton.setEnabled(false);
       configButton = new JButton("Redefine Keys");
+      configButton.setEnabled(false);
    }
 
 
    private void buildConnectComponents() {
-      connectButton = new JButton("Connect");
+      connectButton = new JButton();
       connectButton.setEnabled(false);
+      connectButton.setText("Connect");
+      connectButton.addActionListener(new java.awt.event.ActionListener() {
+         @Override
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            connectButtonAction(evt);
+         }
+
+      });
+
 
      connectionStatus = new JTextField("Initializing...", 20);
      connectionStatus.setEditable(false);
@@ -268,6 +284,39 @@ public class DriverScreen {
 
    public void updateConnectionMessage(String message) {
       connectionStatus.setText(message);
+   }
+
+
+   public void updateInputs(int wheelAngle, int triggerAngle) {
+      inputTextFields[DriverInput.WHEEL.ordinal()].setText(String.valueOf(wheelAngle));
+      inputTextFields[DriverInput.TRIGGER.ordinal()].setText(String.valueOf(triggerAngle));
+   }
+
+   /**
+    * Connect Button was pressed.
+    * 
+    * @param evt
+    */
+   private void connectButtonAction(ActionEvent evt) {
+            for(GuiListener listener : listeners) {
+               listener.processMessage(GuiAction.CONNECT_BUTTON);
+            }
+   }
+
+   public void activateConnectButton(boolean b) {
+      connectButton.setEnabled(b);
+   }
+
+   /**
+    * If true, ConnectButton says Connect. If false, text is set to Disconnect.
+    * @param b
+    */
+   public void setConnectButtonText(String text) {
+      connectButton.setText(text);
+   }
+
+   public void addListener(GuiListener guiListener) {
+      listeners.add(guiListener);
    }
 
    /**
@@ -286,9 +335,12 @@ public class DriverScreen {
 
    private int numInputs;
 
+   private List<GuiListener> listeners;
+
    // Constants
    private static final int BORDER = 12;  // Window border in pixels.
    private static final int GAP = 5;   // Default gap btwn components.
+
 
 
 
