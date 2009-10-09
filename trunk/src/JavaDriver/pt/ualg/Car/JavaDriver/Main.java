@@ -19,6 +19,8 @@ package pt.ualg.Car.JavaDriver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,7 +44,7 @@ public class Main implements Runnable, GuiListener {
       signalCarpadDisconnected = false;
       mainState = null;
       carpad = null;
-      messageQueue = new ConcurrentLinkedQueue<GuiAction>();
+      messageQueue = new ArrayBlockingQueue<GuiAction>(1);
    }
 
    @Override
@@ -174,6 +176,7 @@ public class Main implements Runnable, GuiListener {
       // Create CarpadController
       carpad = new CarpadController(carpadPortName);
 
+
       // Create Broacaster and connect to Carpad Controller
       broadcaster = new CommandBroadcaster(carpad.getReadChannel());
       // Add GUI as a listener
@@ -211,6 +214,12 @@ public class Main implements Runnable, GuiListener {
 
       if(carpad.getState() == CarpadState.TERMINATED) {
          return false;
+      }
+
+      // If Carpad could successfully connect, store carpadPortName
+      String connectedCommPort = carpad.getCommPortName();
+      if(connectedCommPort != null) {
+         carpadPortName = connectedCommPort;
       }
 
       // Wait for first message of broadcaster
@@ -278,8 +287,10 @@ public class Main implements Runnable, GuiListener {
    public void processMessage(GuiAction message) {
 
       // Add action to message queue
-      messageQueue.offer(message);
-
+      boolean hasInserted = messageQueue.offer(message);
+      if(!hasInserted) {
+         logger.warning("GuiAction '"+message+"' ignored.");
+      }
    }
 
 
@@ -355,7 +366,8 @@ public class Main implements Runnable, GuiListener {
 
    // The GUI
    private DriverModel driverModel;
-   private ConcurrentLinkedQueue<GuiAction> messageQueue;
+   private BlockingQueue<GuiAction> messageQueue;
+   //private ConcurrentLinkedQueue<GuiAction> messageQueue;
 
    // Utils
    private Logger logger = Logger.getLogger(Main.class.getName());

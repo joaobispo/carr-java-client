@@ -436,6 +436,14 @@ public class CarpadController implements Runnable {
       return state;
    }
 
+   /**
+    * @return the name of the port it is currently using.
+    */
+   public String getCommPortName() {
+      return commPortName;
+   }
+
+
 
    /**
     * INSTANCE VARIABLES
