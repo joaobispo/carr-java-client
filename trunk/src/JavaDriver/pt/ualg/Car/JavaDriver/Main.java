@@ -17,20 +17,18 @@
 
 package pt.ualg.Car.JavaDriver;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
-import javax.swing.JDialog;
 import pt.ualg.Car.Controller.CarpadController;
 import pt.ualg.Car.Controller.CarpadState;
 import pt.ualg.Car.JavaDriver.GUI.DriverModel;
 import pt.ualg.Car.JavaDriver.GUI.GuiAction;
 import pt.ualg.Car.JavaDriver.GUI.GuiListener;
+import pt.ualg.Car.JavaDriver.System.CommandToKeyboard;
 import pt.ualg.Car.System.CommandBroadcaster;
 
 /**
@@ -41,12 +39,18 @@ public class Main implements Runnable, GuiListener {
 
    public Main(String carpadPortName) {
       this.carpadPortName = carpadPortName;
-      signalCarpadDisconnected = false;
       mainState = null;
       carpad = null;
       messageQueue = new ArrayBlockingQueue<GuiAction>(1);
    }
 
+   /**
+    * Runs the program.
+    *
+    * <p> Note: the instance variable "mainState" can only be changed in this
+    * thread. Any methods which alter this variable can only be called during
+    * this thread.
+    */
    @Override
    public void run() {
       // Start the GUI
@@ -54,6 +58,44 @@ public class Main implements Runnable, GuiListener {
       driverModel.init();
       driverModel.addListener(this);
 
+      // Initialize Program
+      initProgram();
+
+      while(true) {
+
+         // Check if Carpad got disconnected
+         boolean carpadTerminated = carpad.getState() == CarpadState.TERMINATED;
+         boolean isConnected2 =  mainState == MainState.CONNECTED;
+         if(carpadTerminated && isConnected2) {
+            mainState = MainState.WHILE_DISCONNECTING;
+            detachCarpad();
+            mainState = MainState.DISCONNECTED;
+            driverModel.setConnectButtonText("Connect");
+            driverModel.updateDriverScreenMessage("Lost connection with Carpad Controller.");
+         }
+
+
+         // Process any messages from the GUI
+         GuiAction action = messageQueue.poll();
+         while(action != null) {
+            processAction(action);
+            action = messageQueue.poll();
+         }
+
+         try {
+            Thread.sleep(LONG_SLEEP_WAIT);
+         } catch (InterruptedException ex) {
+            logger.warning("Thread Interrupted.");
+         }
+      }
+
+   }
+
+   /**
+    * Steps for initiallizing the program. After this, the program can be
+    * either in CONNECTED or DISCONNECTED state.
+    */
+   private void initProgram() {
       // Put the program in WHILE_CONNECTING state
       mainState = MainState.WHILE_CONNECTING;
       // Try to connect to carpad
@@ -69,52 +111,6 @@ public class Main implements Runnable, GuiListener {
          driverModel.setConnectButtonText("Connect");
       }
       driverModel.activateConnectButton(true);
-
-
-
-      while(true) {
-         /*
-         if(mainState == MainState.CONNECTED) {
-            detachCarpad();
-            driverModel.updateDriverScreenMessage("Disconnected.");
-         }
-          */
-
-         // Check if Carpad got disconnected
-         boolean carpadTerminated = carpad.getState() == CarpadState.TERMINATED;
-         boolean isConnected2 =  mainState == MainState.CONNECTED;
-         if(carpadTerminated && isConnected2) {
-            mainState = MainState.WHILE_DISCONNECTING;
-            detachCarpad();
-            mainState = MainState.DISCONNECTED;
-            driverModel.setConnectButtonText("Connect");
-            driverModel.updateDriverScreenMessage("Lost connection with Carpad Controller.");
-         }
-
-         /*
-         // Check if Carpad got disconnected
-         if(signalCarpadDisconnected) {
-            detachCarpad();
-            signalCarpadDisconnected = false;
-            driverModel.updateDriverScreenMessage("Lost connection with Carpad Controller.");
-         }
-          */
-
-         // Process any messages from the GUI
-         GuiAction action = messageQueue.poll();
-         while(action != null) {
-            processAction(action);
-            action = messageQueue.poll();
-         }
-
-         try {
-            Thread.sleep(LONG_SLEEP_WAIT);
-         } catch (InterruptedException ex) {
-            logger.warning("Thread Interrupted.");
-         }
-      }
-      //boolean isConnected = connectToCarpad();
-
    }
 
    /**
@@ -176,11 +172,16 @@ public class Main implements Runnable, GuiListener {
       // Create CarpadController
       carpad = new CarpadController(carpadPortName);
 
+      // Create translator
+      commandToKeyboard = new CommandToKeyboard();
 
       // Create Broacaster and connect to Carpad Controller
       broadcaster = new CommandBroadcaster(carpad.getReadChannel());
+
       // Add GUI as a listener
       broadcaster.addListener(driverModel);
+      // Add translator as a listener
+      broadcaster.addListener(commandToKeyboard);
 
       // Create Executors
       messagesExec = Executors.newSingleThreadExecutor();
@@ -191,23 +192,6 @@ public class Main implements Runnable, GuiListener {
 
       messagesExec.execute(carpad);
 
-      // Add code in case the connection to carpad terminates
-      /*
-      messagesExec.execute(new Runnable() {
-
-
-         @Override
-         public void run() {
-            // Check state
-            if (mainState == MainState.CONNECTED) {
-               logger.info("Carpad Controller got disconnected.");
-               signalCarpadDisconnected = true;
-            }
-
-
-         }
-      });
-       */
 
       // Wait for inicialization of carpad
       carpad.waitInitialization();
@@ -227,61 +211,6 @@ public class Main implements Runnable, GuiListener {
    }
 
 
-   /**
-    * Looks for CarPad port. Returns null if it is not found.
-    * @return
-    */
-   private String findCarpadPort() {
-      String carpadPort = null;
-      // Find serial ports
-      List<String> serialPorts = CarpadController.listSerialPorts();
-      int numPorts = serialPorts.size();
-
-      for(int i=0; i<numPorts; i++) {
-         String testPort = serialPorts.get(i);
-         driverModel.updateDriverScreenMessage("("+(i+1)+"/"+(numPorts)+") " +
-                 "Looking at port ["+testPort+"]...");
-         boolean isPortConnectable = CarpadController.testPort(testPort);
-
-         if(isPortConnectable) {
-            return testPort;
-         }
-      }
-
-      return carpadPort;
-   }
-
-   private boolean connectToCarpad() {
-      /*
-      if(mainState != mainState.DISCONNECTED) {
-         logger.warning("Could not connect because state is '"+
-                 mainState+"' instead of "+mainState.DISCONNECTED+".");
-         return false;
-      }
-      */
-
-      // Look for controller in the given port
-      driverModel.updateDriverScreenMessage("Trying to find cardpad ["+carpadPortName+"]...");
-      boolean isInPort = CarpadController.testPort(carpadPortName);
-
-      if(!isInPort) {
-         carpadPortName = findCarpadPort();
-      }
-
-      if(carpadPortName != null) {
-         carpad = new CarpadController(carpadPortName);
-      }
-
-      if(carpad == null) {
-         mainState = MainState.DISCONNECTED;
-         driverModel.updateDriverScreenMessage("Could not connect.");
-         return false;
-      } else {
-         mainState = MainState.CONNECTED;
-         driverModel.updateDriverScreenMessage("Found CarPad! ["+carpadPortName+"]");
-         return true;
-      }
-   }
 
    @Override
    public void processMessage(GuiAction message) {
@@ -364,16 +293,16 @@ public class Main implements Runnable, GuiListener {
    // Executes the Broadcasts in another Thread
    private ExecutorService broadcasterExec;
 
+   // Translates the Carpad input into Keypresses
+   private CommandToKeyboard commandToKeyboard;
+
    // The GUI
    private DriverModel driverModel;
    private BlockingQueue<GuiAction> messageQueue;
-   //private ConcurrentLinkedQueue<GuiAction> messageQueue;
 
    // Utils
    private Logger logger = Logger.getLogger(Main.class.getName());
 
-   // Error During Runtime
-   private boolean signalCarpadDisconnected;
 
 
 
