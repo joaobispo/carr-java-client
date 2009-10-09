@@ -29,7 +29,6 @@ import pt.ualg.carr.gui3.ControllerMessageListener;
 public class DriverModel implements ControllerMessageListener {
 
    public DriverModel() {
-      int numPorts = DriverInput.numberOfInputs();
       driverScreen = new DriverScreen();
    }
 
@@ -105,9 +104,6 @@ public class DriverModel implements ControllerMessageListener {
    /**
     * INSTANCE VARIABLES
     */
-   // State
-   //private int[] portValues;
-   //private DriverState driverState;
 
    // Windows
    private DriverScreen driverScreen;

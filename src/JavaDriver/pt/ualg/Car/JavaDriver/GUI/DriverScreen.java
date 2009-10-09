@@ -25,9 +25,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -61,22 +59,12 @@ public class DriverScreen {
       buildConfigComponents();
       buildConnectComponents();
 
-      // Build Inputs Panel
-      //JPanel inputsPanel = buildInputsPanel();
+     
+      JPanel configPanel = makePanelButtons();
+      JPanel inputsAndConfig = makePanelButtonsAndInputs(configPanel);
 
-      //JPanel connectPanel = buildConnectPanel();
-
-      JPanel configPanel = buildConfigPanel();
-
-      JPanel inputsAndConfig = buildJFrameBagLayout(configPanel);
-      //buildJFrameGridLayout(inputsPanel, connectPanel);
-
-      JPanel driverPanel = new JPanel();
-      driverPanel.setLayout(new BorderLayout());
-      driverPanel.setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
-      driverPanel.add(inputsAndConfig, BorderLayout.CENTER);
+      JPanel driverPanel = makePanelMain(inputsAndConfig);
       
-      driverPanel.add(connectionStatus, BorderLayout.SOUTH);
 
 
       windowFrame.add(driverPanel);
@@ -86,58 +74,9 @@ public class DriverScreen {
       windowFrame.pack();
    }
 
-   private JPanel buildInputsPanel() {
-      JPanel inputsPanel = new JPanel();
-      inputsPanel.setLayout(new GridLayout(numInputs, 2));
+   
 
-
-      inputLabels = new JLabel[numInputs];
-      inputTextFields = new JTextField[numInputs];
-
-      DriverInput[] portNames = DriverInput.values();
-      for (int i = 0; i < numInputs; i++) {
-
-         // Create JLabels
-         inputLabels[i] = new JLabel();
-         // Setup JLabels
-         String portName = portNames[i].getName();
-         inputLabels[i].setText(portName+":");
-         inputLabels[i].setHorizontalAlignment(JTextField.LEFT);
-         inputsPanel.add(inputLabels[i]);
-
-         // Create JTextFields
-         inputTextFields[i] = new JTextField(5);
-         // Setup JTextFields
-         inputTextFields[i].setEditable(false);
-         inputTextFields[i].setHorizontalAlignment(JTextField.LEFT);
-         inputsPanel.add(inputTextFields[i]);
-
-      }
-
-      return inputsPanel;
-   }
-
-
-   private JPanel buildConnectPanel() {
-     JPanel connectPanel = new JPanel();
-     GridLayout gridLayout = new GridLayout(2, 1);
-     gridLayout.setVgap(10);
-     connectPanel.setLayout(gridLayout);
-
-     connectButton = new JButton("Connect");
-     connectButton.setEnabled(false);
-     connectPanel.add(connectButton);
-
-     connectionStatus = new JTextField("Initializing...", 20);
-     connectionStatus.setEditable(false);
-     connectionStatus.setHorizontalAlignment(JTextField.CENTER);
-     connectionStatus.setMinimumSize(new Dimension(100, 40));
-     connectPanel.add(connectionStatus);
-
-     return connectPanel;
-   }
-
-   private JPanel buildConfigPanel() {
+   private JPanel makePanelButtons() {
       //... Create an independent GridLayout panel of buttons.
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(3, 1, GAP, GAP));
@@ -150,7 +89,7 @@ public class DriverScreen {
         return buttonPanel;
    }
 
-   private JPanel buildJFrameBagLayout(JPanel configPanel) {
+   private JPanel makePanelButtonsAndInputs(JPanel configPanel) {
       //... Create GridBagLayout content pane; set border.
       JPanel content = new JPanel(new GridBagLayout());
       content.setBorder(BorderFactory.createEmptyBorder(BORDER, BORDER,
@@ -165,70 +104,31 @@ public class DriverScreen {
 
       content.add(new Gap(GAP), pos.nextCol()); // 4th col
 
-      //content.add(calibrateButton, pos.nextCol()); // 5th col
-
       content.add(configPanel, pos.nextCol().height(5).align(GridBagConstraints.NORTH)); // 5th col
 
-      //content.add(new Gap(GAP) , pos.nextRow());  // Add a gap below
-      content.add(new Gap(GAP)  , pos.nextRow());
+      content.add(new Gap(GAP)  , pos.nextRow()); // Add a gap below
+
       // Second line
       content.add(inputLabels[1], pos.nextRow());
       content.add(new Gap(GAP), pos.nextCol()); // 2nd col
       content.add(inputTextFields[1], pos.nextCol()); // 3rd col
-      //      content.add(new Gap(GAP), pos.nextCol()); // 4th col
-
-      //content.add(configButton, pos.nextCol()); // 5th col
 
       content.add(new Gap(2*GAP), pos.nextRow());
-
-
-      
-
-      /*
-      for (int i = 0; i < numInputs; i++) {
-         content.add(inputLabels[i], pos);
-         content.add(new Gap(GAP), pos.nextCol());
-         //content.add(inputTextFields[i], pos.nextCol().expandW());
-         content.add(inputTextFields[i], pos.nextCol());
-
-         if (i == 0) {
-            content.add(new Gap(GAP), pos.nextCol());
-            content.add(configPanel, pos.nextCol().height(5).align(GridBagConstraints.NORTH));
-         }
-
-         content.add(new Gap(GAP), pos.nextRow());  // Add a gap below
-         pos.nextRow();
-      }
-      */
-
-      //content.add(new Gap(GAP), pos.nextRow());  // Add a gap below
-
-      
-      //... Last content row.
-//content.add(new Gap()  , pos.nextRow().width().expandH());
-      //content.add(connectionStatus, pos.nextCol().nextCol());
-      //content.add(connectionStatus, pos.nextRow().nextCol().nextCol());
-         //... Add an area that can expand at the bottom.
-
-        //content.add(new Gap()  , pos.nextRow().width().expandH());
-
-
-
-        
+ 
         return content;
    }
 
+   private JPanel makePanelMain(JPanel inputsAndConfig) {
+      JPanel driverPanel = new JPanel();
+      driverPanel.setLayout(new BorderLayout());
+      driverPanel.setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
+      driverPanel.add(inputsAndConfig, BorderLayout.CENTER);
 
-   private void buildJFrameGridLayout(JPanel inputsPanel, JPanel connectPanel) {
+      driverPanel.add(connectionStatus, BorderLayout.SOUTH);
 
-      // Setup Frame
-      GridLayout gridLayout = new GridLayout(2,1);
-      gridLayout.setVgap(20);
-
-      windowFrame.setLayout(gridLayout);
-      windowFrame.add(inputsPanel);
-      windowFrame.add(connectPanel);
+      return driverPanel;
    }
+
 
    private void buildInputsComponents() {
 
@@ -340,8 +240,6 @@ public class DriverScreen {
    // Constants
    private static final int BORDER = 12;  // Window border in pixels.
    private static final int GAP = 5;   // Default gap btwn components.
-
-
 
 
    }

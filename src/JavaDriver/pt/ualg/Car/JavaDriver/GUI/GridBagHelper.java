@@ -31,7 +31,9 @@ import java.awt.GridBagConstraints;
 public class GridBagHelper extends GridBagConstraints {
 
     //============================================================== constructor
-    /* Creates helper at top left, component always fills cells. */
+    /**
+     * Creates helper at top left, component always fills cells.
+     */
     public GridBagHelper() {
         gridx = 0;
         gridy = 0;
@@ -39,14 +41,18 @@ public class GridBagHelper extends GridBagConstraints {
     }
 
     //================================================================== nextCol
-    /* Moves the helper's cursor to the right one column. */
+    /**
+     * Moves the helper's cursor to the right one column.
+     */
     public GridBagHelper nextCol() {
         gridx++;
         return this;
     }
 
     //================================================================== nextRow
-    /* Moves the helper's cursor to first col in next row. */
+    /**
+     * Moves the helper's cursor to first col in next row.
+     */
     public GridBagHelper nextRow() {
         gridx = 0;
         gridy++;
@@ -54,9 +60,11 @@ public class GridBagHelper extends GridBagConstraints {
     }
 
     //================================================================== expandW
-    /* Expandable Width.  Returns new helper allowing horizontal expansion.
-       A new helper is created so the expansion values don't
-       pollute the origin helper. */
+    /**
+     * Expandable Width.  Returns new helper allowing horizontal expansion.
+     *  A new helper is created so the expansion values don't
+     *  pollute the origin helper.
+     */
     public GridBagHelper expandW() {
         GridBagHelper duplicate = (GridBagHelper)this.clone();
         duplicate.weightx = 1.0;
@@ -64,7 +72,7 @@ public class GridBagHelper extends GridBagConstraints {
     }
 
     //================================================================== expandH
-    /* Expandable Height. Returns new helper allowing vertical expansion. */
+    /** Expandable Height. Returns new helper allowing vertical expansion. */
     public GridBagHelper expandH() {
         GridBagHelper duplicate = (GridBagHelper)this.clone();
         duplicate.weighty = 1.0;
@@ -72,7 +80,7 @@ public class GridBagHelper extends GridBagConstraints {
     }
 
     //==================================================================== width
-    /* Sets the width of the area in terms of number of columns. */
+    /** Sets the width of the area in terms of number of columns. */
     public GridBagHelper width(int colsWide) {
         GridBagHelper duplicate = (GridBagHelper)this.clone();
         duplicate.gridwidth = colsWide;
@@ -80,7 +88,7 @@ public class GridBagHelper extends GridBagConstraints {
     }
 
     //==================================================================== width
-    /* Width is set to all remaining columns of the grid. */
+    /** Width is set to all remaining columns of the grid. */
     public GridBagHelper width() {
         GridBagHelper duplicate = (GridBagHelper)this.clone();
         duplicate.gridwidth = REMAINDER;
@@ -88,7 +96,7 @@ public class GridBagHelper extends GridBagConstraints {
     }
 
     //=================================================================== height
-    /* Sets the height of the area in terms of rows. */
+    /** Sets the height of the area in terms of rows. */
     public GridBagHelper height(int rowsHigh) {
         GridBagHelper duplicate = (GridBagHelper)this.clone();
         duplicate.gridheight = rowsHigh;
@@ -96,7 +104,7 @@ public class GridBagHelper extends GridBagConstraints {
     }
 
     //=================================================================== height
-    /* Height is set to all remaining rows. */
+    /** Height is set to all remaining rows. */
     public GridBagHelper height() {
         GridBagHelper duplicate = (GridBagHelper)this.clone();
         duplicate.gridheight = REMAINDER;
@@ -104,7 +112,7 @@ public class GridBagHelper extends GridBagConstraints {
     }
 
     //==================================================================== align
-    /* Alignment is set by parameter. */
+    /** Alignment is set by parameter. */
     public GridBagHelper align(int alignment) {
         GridBagHelper duplicate = (GridBagHelper)this.clone();
         duplicate.fill   = NONE;
