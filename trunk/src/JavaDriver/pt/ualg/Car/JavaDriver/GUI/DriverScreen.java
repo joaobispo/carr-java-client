@@ -18,15 +18,16 @@
 package pt.ualg.Car.JavaDriver.GUI;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,9 +41,9 @@ import pt.ualg.Car.JavaDriver.System.DriverInput;
  */
 public class DriverScreen {
 
-   public DriverScreen() {
+   public DriverScreen(List<GuiListener> listeners) {
       numInputs = DriverInput.numberOfInputs();
-      listeners = new ArrayList<GuiListener>();
+      this.listeners = listeners;
    }
 
    public JFrame getWindowFrame() {
@@ -159,7 +160,13 @@ public class DriverScreen {
       calibrateButton = new JButton("Calibrate");
       calibrateButton.setEnabled(false);
       configButton = new JButton("Redefine Keys");
-      configButton.setEnabled(false);
+      //configButton.setEnabled(false);
+      configButton.addActionListener(new java.awt.event.ActionListener() {
+         @Override
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            configButtonAction(evt);
+         }
+      });
    }
 
 
@@ -203,6 +210,19 @@ public class DriverScreen {
             }
    }
 
+   /**
+    * Config Button was pressed.
+    *
+    * @param evt
+    */
+   private void configButtonAction(ActionEvent evt) {
+      // Open RedefineKeys Screen
+      redefineKeysDialog = new JDialog(windowFrame);
+      redefineKeysDialog.setModalityType(ModalityType.APPLICATION_MODAL);
+      redefineKeysDialog.setVisible(true);
+
+   }
+
    public void activateConnectButton(boolean b) {
       connectButton.setEnabled(b);
    }
@@ -215,13 +235,19 @@ public class DriverScreen {
       connectButton.setText(text);
    }
 
+   /*
    public void addListener(GuiListener guiListener) {
       listeners.add(guiListener);
    }
+    */
 
    /**
     * INSTANCE VARIABLES
     */
+   // Additional Windows
+   private JDialog redefineKeysDialog;
+
+
    // Panel Inputs Info
    private JFrame windowFrame;
    private JLabel[] inputLabels;

@@ -15,7 +15,7 @@
  *  under the License.
  */
 
-package pt.ualg.carr.gui3;
+package pt.ualg.Car.Controller;
 
 import pt.ualg.Car.Controller.ControllerMessage;
 
