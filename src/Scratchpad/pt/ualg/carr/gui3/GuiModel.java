@@ -17,6 +17,7 @@
 
 package pt.ualg.carr.gui3;
 
+import pt.ualg.Car.Controller.ControllerMessageListener;
 import java.util.logging.Logger;
 import pt.ualg.Car.Controller.ControllerInput;
 import pt.ualg.Car.Controller.ControllerMessage;

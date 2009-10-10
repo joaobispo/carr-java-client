@@ -23,7 +23,7 @@ import java.awt.event.KeyEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import pt.ualg.Car.Controller.ControllerMessage;
-import pt.ualg.carr.gui3.ControllerMessageListener;
+import pt.ualg.Car.Controller.ControllerMessageListener;
 
 /**
  *

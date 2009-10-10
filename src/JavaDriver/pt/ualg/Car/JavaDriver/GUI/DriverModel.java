@@ -17,10 +17,12 @@
 
 package pt.ualg.Car.JavaDriver.GUI;
 
+import java.util.ArrayList;
+import java.util.List;
 import pt.ualg.Car.Controller.ControllerMessage;
 import pt.ualg.Car.JavaDriver.System.DriverInput;
 import pt.ualg.Car.common.GuiUtils;
-import pt.ualg.carr.gui3.ControllerMessageListener;
+import pt.ualg.Car.Controller.ControllerMessageListener;
 
 /**
  *
@@ -29,7 +31,8 @@ import pt.ualg.carr.gui3.ControllerMessageListener;
 public class DriverModel implements ControllerMessageListener {
 
    public DriverModel() {
-      driverScreen = new DriverScreen();
+      listeners = new ArrayList<GuiListener>();
+      driverScreen = new DriverScreen(listeners);
    }
 
    /**
@@ -96,7 +99,7 @@ public class DriverModel implements ControllerMessageListener {
        GuiUtils.runOnEdt(new Runnable() {
          @Override
          public void run() {
-            driverScreen.addListener(listener);
+            listeners.add(listener);
          }
       });
    }
@@ -108,6 +111,8 @@ public class DriverModel implements ControllerMessageListener {
    // Windows
    private DriverScreen driverScreen;
 
+   // Global Listeners List for this Window Application
+   private List<GuiListener> listeners;
 
 
 }
