@@ -208,7 +208,7 @@ public class CarpadControllerPort implements Runnable {
    /**
     * @return the default COM port name, according to operating system.
     */
-   private static String defaultCommPortName() {
+   public static String defaultCommPortName() {
       String os = System.getProperty("os.name");
       String lowerOs = os.toLowerCase();
 

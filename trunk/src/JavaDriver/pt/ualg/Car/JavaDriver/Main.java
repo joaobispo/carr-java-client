@@ -17,19 +17,21 @@
 
 package pt.ualg.Car.JavaDriver;
 
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import pt.ualg.Car.Controller.CarpadControllerPort;
 import pt.ualg.Car.Controller.CarpadState;
 import pt.ualg.Car.JavaDriver.GUI.DriverModel;
 import pt.ualg.Car.JavaDriver.GUI.GuiAction;
 import pt.ualg.Car.JavaDriver.GUI.GuiListener;
 import pt.ualg.Car.JavaDriver.System.CommandToKeyboard;
+import pt.ualg.Car.Option;
 import pt.ualg.Car.System.CommandBroadcaster;
+import pt.ualg.Car.common.PrefUtils;
 
 /**
  *
@@ -37,8 +39,15 @@ import pt.ualg.Car.System.CommandBroadcaster;
  */
 public class Main implements Runnable, GuiListener {
 
-   public Main(String carpadPortName) {
-      this.carpadPortName = carpadPortName;
+   public Main() {
+      // Get carpadPortName - Using the preferences method so it can return null
+      // if not found.
+      String commPortName = prefs.get(Option.CommPortNameString.name(), null);
+      if(commPortName == null) {
+         commPortName = CarpadControllerPort.defaultCommPortName();
+      }
+
+      this.carpadPortName = commPortName;
       mainState = null;
       carpad = null;
       messageQueue = new ArrayBlockingQueue<GuiAction>(1);
@@ -204,6 +213,7 @@ public class Main implements Runnable, GuiListener {
       String connectedCommPort = carpad.getCommPortName();
       if(connectedCommPort != null) {
          carpadPortName = connectedCommPort;
+         PrefUtils.putPref(prefs, Option.CommPortNameString, carpadPortName);
       }
 
       // Wait for first message of broadcaster
@@ -302,6 +312,7 @@ public class Main implements Runnable, GuiListener {
 
    // Utils
    private Logger logger = Logger.getLogger(Main.class.getName());
+   private Preferences prefs = Preferences.userNodeForPackage(Option.classValue);
 
 
 

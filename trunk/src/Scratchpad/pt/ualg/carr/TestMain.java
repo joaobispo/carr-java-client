@@ -39,6 +39,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import pt.amaze.ASL.DataManagement.DataMap;
 import pt.amaze.ASL.LoggingUtils;
+import pt.ualg.Car.Controller.CarpadControllerPort;
 import pt.ualg.Car.Controller.CarpadControllerProtos.CarpadControllerData;
 import pt.ualg.Car.JavaDriver.Main;
 import pt.ualg.Car.Option;
@@ -87,9 +88,9 @@ public class TestMain {
         //attachDetachKeyboard();
 
         //testGui3();
-        //testJavaDriver();
+        testJavaDriver();
         //testJavaDriverWithConfig();
-        testPreferences();
+        //testPreferences();
     }
 
    public static void testSerialComm() {
@@ -450,8 +451,9 @@ String commPortName = "COM4";
 
    private static void testJavaDriver() {
       long millisInPeriod = 40;
-      
-      Main main = new Main("COM5");
+
+
+      Main main = new Main();
 
       ExecutorService keybExecutor = Executors.newSingleThreadExecutor();
       keybExecutor.execute(main);
@@ -620,15 +622,30 @@ String commPortName = "COM4";
       //String preferencePackage = "com.pt.ualg.Car";
       //Class className = Class.forName(preferencePackage);
       
-      Preferences pref = Preferences.userNodeForPackage(pt.ualg.Car.Option.class);
+      Preferences pref = Preferences.userNodeForPackage(Option.classValue);
+      
+      try {
+         System.out.println(Arrays.toString(pref.keys()));
+         // Store as String
+         //Option option = Option.CalibrationTriggerNeutralInt;
+         //pref.put(option.name(), option.defaultValue());
+         // Retrive as Int
+         //System.out.println(pref.getInt(option.name(), -1));
+         //pref.putInt("INT", 21);
+//pref.remove("INT");
+//      System.out.println(pref.getInt("INT", 0));
+         //System.out.println(pref.get("net", null));
+      } catch (BackingStoreException ex) {
+         Logger.getLogger(TestMain.class.getName()).log(Level.SEVERE, null, ex);
+      }
 
       // Store as String
-      Option option = Option.CalibrationTriggerNeutralInt;
-      pref.put(option.name(), option.toString());
+      //Option option = Option.CalibrationTriggerNeutralInt;
+      //pref.put(option.name(), option.defaultValue());
 
       // Retrive as Int
 
-      System.out.println(pref.getInt(option.name(), -1));
+      //System.out.println(pref.getInt(option.name(), -1));
       //pref.putInt("INT", 21);
 //pref.remove("INT");
 //      System.out.println(pref.getInt("INT", 0));

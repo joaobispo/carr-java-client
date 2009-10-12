@@ -15,31 +15,15 @@
  *  under the License.
  */
 
-package pt.ualg.Car;
-
-import java.util.prefs.Preferences;
+package pt.ualg.Car.common;
 
 /**
  *
  * @author Joao Bispo
  */
-public class PrefWrapper {
+public interface PrefEnum {
 
-   public PrefWrapper(Class<?> c, Enum enumeration, boolean userNode) {
-      if(userNode) {
-         pref = Preferences.userNodeForPackage(c);
-      } else {
-         pref = Preferences.systemNodeForPackage(c);
-      }
-      
-      this.enumeration = enumeration;
-   }
-
-
-
-   /**
-    * INSTANCE VARIABLES
-    */
-   private Preferences pref;
-   private Enum enumeration;
+   public String getName();
+   public String defaultValue();
+   public Class<?> getClassValue();
 }
