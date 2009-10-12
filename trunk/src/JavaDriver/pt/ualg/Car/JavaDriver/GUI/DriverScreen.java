@@ -56,6 +56,9 @@ public class DriverScreen {
    public void initComponents() {
       windowFrame = new JFrame();
 
+      /**
+       * Building this Window
+       */
       buildInputsComponents();
       buildConfigComponents();
       buildConnectComponents();
@@ -73,6 +76,12 @@ public class DriverScreen {
       windowFrame.setTitle("Carpad Driver");
       windowFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
       windowFrame.pack();
+      windowFrame.setResizable(false);
+
+      /**
+       * Build other Screens
+       */
+       this.redefineKeysScreen = new RedefineKeysScreen(windowFrame, listeners);
    }
 
    
@@ -217,9 +226,10 @@ public class DriverScreen {
     */
    private void configButtonAction(ActionEvent evt) {
       // Open RedefineKeys Screen
-      redefineKeysDialog = new JDialog(windowFrame);
-      redefineKeysDialog.setModalityType(ModalityType.APPLICATION_MODAL);
-      redefineKeysDialog.setVisible(true);
+      //redefineKeysDialog = new JDialog(windowFrame);
+      //redefineKeysDialog.setModalityType(ModalityType.APPLICATION_MODAL);
+      //redefineKeysDialog.setVisible(true);
+      redefineKeysScreen.appear();
 
    }
 
@@ -245,7 +255,8 @@ public class DriverScreen {
     * INSTANCE VARIABLES
     */
    // Additional Windows
-   private JDialog redefineKeysDialog;
+   //private JDialog redefineKeysDialog;
+   private RedefineKeysScreen redefineKeysScreen;
 
 
    // Panel Inputs Info

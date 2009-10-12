@@ -21,34 +21,36 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
-import java.awt.Window;
+import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+import pt.amaze.ASL.DataManagement.DataMap;
 import pt.amaze.ASL.LoggingUtils;
+import pt.ualg.Car.Controller.CarpadControllerProtos.CarpadControllerData;
 import pt.ualg.Car.JavaDriver.Main;
-import pt.ualg.Car.common.Concurrent.ReadChannel;
+import pt.ualg.Car.Option;
 import pt.ualg.Car.common.LoggingUtils2;
 import pt.ualg.carr.client1.CarPadInput;
 import pt.ualg.carr.client1.Command;
-import pt.ualg.carr.client1.ListenerExample;
 import pt.ualg.carr.gui2.CommandBroadcaster;
-import pt.ualg.carr.gui.MainWindow;
-import pt.ualg.carr.gui2.CarpadController;
+import pt.ualg.carr.gui2.CarpadControllerPortGui2;
 import pt.ualg.carr.gui2.CommandToKeyboard;
 import pt.ualg.carr.gui2.KeyboardController;
 import pt.ualg.carr.gui2.MainProgram;
 import pt.ualg.carr.gui2.MainScreen;
-import pt.ualg.carr.gui3.ArduinoEmulator;
-import pt.ualg.carr.gui3.GuiModel;
-import pt.ualg.carr.gui3.KeyController;
 import pt.ualg.carr.gui3.Launcher;
 
 /**
@@ -68,6 +70,7 @@ public class TestMain {
 
         testLibraryExists();
 
+        //testKeyMappings();
        //testSerialComm();
        //testCarPadInputOnly();
 
@@ -84,7 +87,9 @@ public class TestMain {
         //attachDetachKeyboard();
 
         //testGui3();
-        testJavaDriver();
+        //testJavaDriver();
+        //testJavaDriverWithConfig();
+        testPreferences();
     }
 
    public static void testSerialComm() {
@@ -199,8 +204,9 @@ String commPortName = "COM4";
       }
    }
 
+
    private static void testGui2() {
-      System.out.println("Found ports: "+CarpadController.listSerialPorts());
+      System.out.println("Found ports: "+CarpadControllerPortGui2.listSerialPorts());
 
       // Create Screen
       MainScreen mainScreen = new MainScreen(Command.NUM_PORTS);
@@ -219,8 +225,8 @@ String commPortName = "COM4";
 
       // Create carPad
       //final CarPadInput carPad = new CarPadInput(channel, "COM4");
-      final CarpadController carPad = new CarpadController("COM4", channel);
-      //final CarpadController carPad = new CarpadController("/dev/ttyS0", channel);
+      final CarpadControllerPortGui2 carPad = new CarpadControllerPortGui2("COM4", channel);
+      //final CarpadControllerPortGui2 carPad = new CarpadControllerPortGui2("/dev/ttyS0", channel);
 
       // Executor
       ExecutorService signalExecutor = Executors.newSingleThreadExecutor();
@@ -320,27 +326,27 @@ String commPortName = "COM4";
    }
 
    private static void testControllerSerial() {
-      System.out.println("Found ports: "+CarpadController.listSerialPorts());
+      System.out.println("Found ports: "+CarpadControllerPortGui2.listSerialPorts());
 
-      //String comPort = CarpadController.findCarController();
-      //System.out.println(CarpadController.testPort("qq coisa"));
+      //String comPort = CarpadControllerPortGui2.findCarController();
+      //System.out.println(CarpadControllerPortGui2.testPort("qq coisa"));
 
       System.out.println("Launching CarPad");
       BlockingQueue<Command> channel = new ArrayBlockingQueue<Command>(1);
-      CarpadController carPad = new CarpadController("COM4", channel);
+      CarpadControllerPortGui2 carPad = new CarpadControllerPortGui2("COM4", channel);
       ExecutorService carPadExecutor = Executors.newSingleThreadExecutor();
       carPadExecutor.execute(carPad);
 
       carPadExecutor.shutdown();
       /*
-      SerialPort serialPort = CarpadController.connectSerial("COM3", "Testing Ports");
+      SerialPort serialPort = CarpadControllerPortGui2.connectSerial("COM3", "Testing Ports");
 
       if(serialPort != null) {
          System.out.println("Port could be opened!");
          serialPort.close();
       }
 
-      SerialPort serialPort2 = CarpadController.connectSerial("COM3", "Testing Ports");
+      SerialPort serialPort2 = CarpadControllerPortGui2.connectSerial("COM3", "Testing Ports");
 
       if(serialPort2 != null) {
          System.out.println("Port could be opened again!");
@@ -383,9 +389,9 @@ String commPortName = "COM4";
 
    private static void attachDetachKeyboard() {
       
-      //String portComm = CarpadController.findCarController();
+      //String portComm = CarpadControllerPortGui2.findCarController();
       //System.out.println("A porta foi: "+portComm);
-      //CarpadController carpad = new CarpadController(null);
+      //CarpadControllerPortGui2 carpad = new CarpadControllerPortGui2(null);
 
 
       long millisInPeriod = 40;
@@ -444,11 +450,192 @@ String commPortName = "COM4";
 
    private static void testJavaDriver() {
       long millisInPeriod = 40;
-
+      
       Main main = new Main("COM5");
 
       ExecutorService keybExecutor = Executors.newSingleThreadExecutor();
       keybExecutor.execute(main);
+       
    }
+
+   
+   private static void testJavaDriverWithConfig() {
+      String dataname = "datamap.txt";
+      DataMap datamap = new DataMap(dataname);
+
+      
+
+      String filename = "properties.txt";
+      Properties properties = new Properties();
+      properties.setProperty("Option2", "hello2");
+
+      
+
+      FileOutputStream output;
+      boolean fileWritten = true;
+      try {
+         output = new FileOutputStream(filename);
+         properties.store(output, "Comments!");
+         output.close();
+      } catch (FileNotFoundException ex) {
+         logger.warning("Could not create configuration file '" + filename + "'.");
+         fileWritten = false;
+      } catch (IOException ex) {
+         logger.warning("IOException while writing the configuration file '" + filename + "'.");
+         fileWritten = false;
+      }
+
+      if(fileWritten) {
+         logger.info("Configuration file '"+filename+"' written.");
+      }
+
+
+
+
+
+      /*
+      String filename = "config.dat";
+
+      CarpadControllerData carpadData = openProtoFile(filename);
+
+      System.out.println(carpadData.getKeyboardMaps().getTriggerDown());
+
+      CarpadControllerData.newBuilder(carpadData)
+              .setKeyboardMaps(CarpadControllerData.newBuilder()
+              .);
+
+      carpadData.toBuilder().setKeyboardMaps(carpadData.getKeyboardMaps().toBuilder().setTriggerDown(10));
+
+      System.out.println(carpadData.getKeyboardMaps().getTriggerDown());
+
+*/
+//      writeProtoFile(carpadData, filename);
+
+      /*
+      CarpadController.Builder carpadBuilder = CarpadController.newBuilder();
+
+      // Try to open the file
+      FileInputStream streamFile = null;
+      boolean fileExists = true;
+
+      try {
+         streamFile = new FileInputStream(filename);
+      } catch (FileNotFoundException ex) {
+         fileExists = false;
+         logger.info("File '"+filename+"' not found. Creating new configuration " +
+                 "file.");
+      }
+
+      // Merge contents of file into object
+      if(fileExists) {
+         try {
+            carpadBuilder.mergeFrom(streamFile);
+         } catch (IOException ex) {
+            logger.warning("IOException while reading configuration file '"+filename+"'.");
+         }
+      } 
+      
+      // Build the DataFile
+      CarpadController carpadData = carpadBuilder.build();
+      
+      // Create new file on disk
+      if(!fileExists) {
+         writeProtoFile(carpadData, filename);
+      }
+       */
+
+
+   }
+
+   private static CarpadControllerData openProtoFile(String filename) {
+      CarpadControllerData.Builder carpadBuilder = CarpadControllerData.newBuilder();
+      boolean fileExists = true;
+
+       // Try to open the file
+      FileInputStream streamFile = null;
+      try {
+         streamFile = new FileInputStream(filename);
+      } catch (FileNotFoundException ex) {
+         fileExists = false;
+      }
+
+      // Merge contents of file into object
+      if(fileExists) {
+         try {
+            carpadBuilder.mergeFrom(streamFile);
+         } catch (IOException ex) {
+            logger.warning("IOException while reading configuration file '"+filename+"'.");
+         }
+      }
+
+      // Build CarpadController
+      CarpadControllerData carpadData = carpadBuilder.build();
+
+      // Create new file on disk if it doesn't exist.
+      if(!fileExists) {
+                  logger.info("File '"+filename+"' not found. Creating new configuration " +
+                 "file.");
+         writeProtoFile(carpadData, filename);
+      }
+
+      return carpadData;
+   }
+
+   private static void writeProtoFile(CarpadControllerData carpadData, String filename) {
+      FileOutputStream output;
+      boolean fileWritten = true;
+      try {
+         output = new FileOutputStream(filename);
+         carpadData.writeTo(output);
+         output.close();
+      } catch (FileNotFoundException ex) {
+         logger.warning("Could not create configuration file '" + filename + "'.");
+         fileWritten = false;
+      } catch (IOException ex) {
+         logger.warning("IOException while writing the configuration file '" + filename + "'.");
+         fileWritten = false;
+      }
+
+      if(fileWritten) {
+         logger.info("Configuration file '"+filename+"' written.");
+      }
+   }
+
+   private static void testKeyMappings() {
+      int key;
+      key = KeyEvent.VK_L;
+      System.out.println(KeyEvent.getKeyText(key)+":"+key);
+
+      key = KeyEvent.VK_J;
+      System.out.println(KeyEvent.getKeyText(key)+":"+key);
+
+      key = KeyEvent.VK_A;
+      System.out.println(KeyEvent.getKeyText(key)+":"+key);
+
+      key = KeyEvent.VK_Z;
+      System.out.println(KeyEvent.getKeyText(key)+":"+key);
+   }
+
+   private static void testPreferences() {
+      //String preferencePackage = "com.pt.ualg.Car";
+      //Class className = Class.forName(preferencePackage);
+      
+      Preferences pref = Preferences.userNodeForPackage(pt.ualg.Car.Option.class);
+
+      // Store as String
+      Option option = Option.CalibrationTriggerNeutralInt;
+      pref.put(option.name(), option.toString());
+
+      // Retrive as Int
+
+      System.out.println(pref.getInt(option.name(), -1));
+      //pref.putInt("INT", 21);
+//pref.remove("INT");
+//      System.out.println(pref.getInt("INT", 0));
+      //System.out.println(pref.get("net", null));
+   }
+
+   private static Logger logger = Logger.getLogger(TestMain.class.getName());
+
 
 }

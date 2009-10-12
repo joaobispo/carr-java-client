@@ -20,7 +20,7 @@ package pt.ualg.carr.gui3;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
-import pt.ualg.Car.Controller.CarpadController;
+import pt.ualg.Car.Controller.CarpadControllerPort;
 import pt.ualg.Car.System.CommandBroadcaster;
 
 /**
@@ -49,7 +49,7 @@ public class Launcher implements Runnable {
       //attachKeyboard();
       /*
       messagesExec = Executors.newSingleThreadExecutor();
-      messagesExec.execute(new CarpadController());
+      messagesExec.execute(new CarpadControllerPort());
       messagesExec.execute(new Runnable() {
 
          @Override
@@ -204,8 +204,8 @@ public class Launcher implements Runnable {
          return;
       }
 
-      // Create CarpadController
-      carpad = new CarpadController(carpadPortName);
+      // Create CarpadControllerPort
+      carpad = new CarpadControllerPort(carpadPortName);
 
       // Create Broacaster and connect to Carpad Controller
       broadcaster = new CommandBroadcaster(carpad.getReadChannel());
@@ -312,7 +312,7 @@ public class Launcher implements Runnable {
    private final static long LONG_SLEEP_WAIT = 1000;
 
    // Carpad controller
-   private CarpadController carpad;
+   private CarpadControllerPort carpad;
 
    // Keyboard controller
    private KeyController keyboard;
