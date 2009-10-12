@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import pt.amaze.ASL.LoggingUtils;
 import pt.ualg.Car.JavaDriver.Main;
 import pt.ualg.Car.common.Concurrent.ReadChannel;
+import pt.ualg.Car.common.LoggingUtils2;
 import pt.ualg.carr.client1.CarPadInput;
 import pt.ualg.carr.client1.Command;
 import pt.ualg.carr.client1.ListenerExample;
@@ -62,6 +63,8 @@ public class TestMain {
     public static void main(String[] args) {
 
        LoggingUtils.setupConsoleOnly();
+       LoggingUtils2.redirectSystemOut();
+       LoggingUtils2.redirectSystemErr();
 
         testLibraryExists();
 
