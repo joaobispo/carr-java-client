@@ -47,16 +47,16 @@ import pt.ualg.carr.client1.Command;
  *
  * @author Joao Bispo
  */
-public class CarpadController implements Runnable {
+public class CarpadControllerPortGui2 implements Runnable {
 
    // Creates an object using the default serial port.
    // This port is operating-system dependent.
-   public CarpadController(BlockingQueue<Command> channel) {
+   public CarpadControllerPortGui2(BlockingQueue<Command> channel) {
       // Assign default ports, according to operating system
       this(defaultCommPortName(), channel);
    }
 
-   public CarpadController(String commPortName, BlockingQueue<Command> channel) {
+   public CarpadControllerPortGui2(String commPortName, BlockingQueue<Command> channel) {
       this.commPortName = commPortName;
       this.channel = channel;
       run = false;
@@ -627,7 +627,7 @@ public class CarpadController implements Runnable {
    /**
     * INSTANCE VARIABLES
     */
-   private static final Logger logger = Logger.getLogger(CarpadController.class.getName());
+   private static final Logger logger = Logger.getLogger(CarpadControllerPortGui2.class.getName());
    /*
    private static final int COUNTER_TIMEOUT = 40;
    private static final int COUNTER_TIMEOUT_FIRST_QUARTER = (COUNTER_TIMEOUT / 4);

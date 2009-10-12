@@ -38,16 +38,16 @@ import pt.ualg.Car.common.Concurrent.WriteChannel;
  *
  * @author Joao Bispo
  */
-public class CarpadController implements Runnable {
+public class CarpadControllerPort implements Runnable {
 
    // Creates an object using the default serial port.
    // This port is operating-system dependent.
-   public CarpadController() {
+   public CarpadControllerPort() {
       // Assign default ports, according to operating system
       this(defaultCommPortName());
    }
 
-   public CarpadController(String commPortName) {
+   public CarpadControllerPort(String commPortName) {
       // Sanitize commPortName
       if (commPortName == null) {
          this.commPortName = "";
@@ -448,7 +448,7 @@ public class CarpadController implements Runnable {
    /**
     * INSTANCE VARIABLES
     */
-   private static final Logger logger = Logger.getLogger(CarpadController.class.getName());
+   private static final Logger logger = Logger.getLogger(CarpadControllerPort.class.getName());
 
    private static final long INPUTSTREAM_TIMEOUT_MILLIS = 1000;
    private static final long INPUTSTREAM_TIMEOUT_NANOS = TimeUtils.millisToNanos(INPUTSTREAM_TIMEOUT_MILLIS);

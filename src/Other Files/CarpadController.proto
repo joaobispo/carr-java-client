@@ -1,0 +1,24 @@
+package AldricCarJavaClient;
+
+option java_package = "pt.ualg.Car.Controller";
+option java_outer_classname = "CarpadControllerProtos";
+
+message KeyboardMaps {
+   optional int32 wheelUp = 1 [default = 76]; //KeyEvent.VK_L;
+   optional int32 wheelDown = 2 [default = 74]; //KeyEvent.VK_J;
+   optional int32 triggerUp = 3 [default = 65]; //KeyEvent.VK_A;
+   optional int32 triggerDown = 4 [default = 90]; //KeyEvent.VK_Z;
+}
+
+message Calibration {
+   optional int32 wheelNeutralValue = 1 [default = 93];
+   optional int32 triggerNeutralValue = 2 [default = 86];
+   optional int32 wheelSensitivity = 3 [default = 3];
+   optional int32 triggerSensitivity = 4 [default = 4];
+}
+
+message CarpadControllerData {
+   optional KeyboardMaps keyboardMaps = 1;
+   optional Calibration calibration = 2;
+   optional string commPortName = 3;
+}

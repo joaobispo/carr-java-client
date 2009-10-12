@@ -8,6 +8,7 @@
                 <root id="src.JavaDriver.dir" name="JavaDriver"/>
                 <root id="src.dir" name="Client Source"/>
                 <root id="Scratchpad.dir" name="Scratchpad"/>
+                <root id="src.Other%20Files.dir" name="Other Files"/>
             </source-roots>
             <test-roots>
                 <root id="test.src.dir"/>

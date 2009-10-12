@@ -23,7 +23,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
-import pt.ualg.Car.Controller.CarpadController;
+import pt.ualg.Car.Controller.CarpadControllerPort;
 import pt.ualg.Car.Controller.CarpadState;
 import pt.ualg.Car.JavaDriver.GUI.DriverModel;
 import pt.ualg.Car.JavaDriver.GUI.GuiAction;
@@ -169,8 +169,8 @@ public class Main implements Runnable, GuiListener {
          return false;
       }
 
-      // Create CarpadController
-      carpad = new CarpadController(carpadPortName);
+      // Create CarpadControllerPort
+      carpad = new CarpadControllerPort(carpadPortName);
 
       // Create translator
       commandToKeyboard = new CommandToKeyboard();
@@ -283,7 +283,7 @@ public class Main implements Runnable, GuiListener {
    private final static long LONG_SLEEP_WAIT = 1000;
 
    // Carpad controller
-   private CarpadController carpad;
+   private CarpadControllerPort carpad;
    // Thread that passes the Controller Messages to the Broadcaster.
    // Executes the interface between the CarPad Controller and the Broadcaster
    private ExecutorService messagesExec;
