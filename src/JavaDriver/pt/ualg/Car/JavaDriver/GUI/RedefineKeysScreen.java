@@ -19,10 +19,17 @@ package pt.ualg.Car.JavaDriver.GUI;
 
 import java.awt.Dialog.ModalityType;
 import java.awt.Frame;
+import java.awt.GridLayout;
+import java.awt.event.KeyEvent;
 import java.util.List;
+import java.util.prefs.Preferences;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
+import pt.ualg.Car.Option;
+import pt.ualg.Car.common.ParsingUtils;
+import pt.ualg.Car.common.PrefUtils;
 
 /**
  *
@@ -46,6 +53,10 @@ public class RedefineKeysScreen {
 
       // Build Screen Components
       buildComponents();
+
+      JPanel panel = buildPanel();
+      redefineKeysScreen.add(panel);
+      redefineKeysScreen.pack();
    }
 
    /**
@@ -56,10 +67,35 @@ public class RedefineKeysScreen {
 
       // Buttons
       btAssignKeys = new JButton[numInputs];
-      for(int i=0; i<inputs.length; i++) {
-        btAssignKeys[0] = new JButton(inputs[i]);
+      for(int i=0; i<numInputs; i++) {
+        btAssignKeys[i] = new JButton(inputs[i]);
       }
 
+      // Textfields
+      tfAssignKeys = new JTextField[numInputs];
+      for(int i=0; i<numInputs; i++) {
+         String keyString = PrefUtils.getPref(prefs, inputsMapping[i]);
+         int keyInt = ParsingUtils.parseInt(keyString);
+         String defaultValue = KeyEvent.getKeyText(keyInt);
+         tfAssignKeys[i] = new JTextField(defaultValue);
+         tfAssignKeys[i].setEditable(false);
+      }
+
+   }
+
+
+   private JPanel buildPanel() {
+      int numInputs = inputs.length;
+
+      JPanel jpanel = new JPanel();
+      jpanel.setLayout(new GridLayout(numInputs, 2, GAP, GAP));
+
+      for(int i=0; i<numInputs; i++) {
+         jpanel.add(btAssignKeys[i]);
+         jpanel.add(tfAssignKeys[i]);
+      }
+
+      return jpanel;
    }
 
    /**
@@ -90,5 +126,16 @@ public class RedefineKeysScreen {
    "Wheel Backward",
    "Trigger Action",
    "Trigger Reverse"};
+
+   private static final Option[] inputsMapping = {
+      Option.KeyMapWheelUp,
+      Option.KeyMapWheelDown,
+      Option.KeyMapTriggerUp,
+      Option.KeyMapTriggerDown
+   };
+
+   private Preferences prefs = Preferences.userNodeForPackage(Option.classValue);
+
+   private static final int GAP = 5;   // Default gap btwn components.
 
 }

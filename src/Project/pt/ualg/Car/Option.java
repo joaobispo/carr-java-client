@@ -17,24 +17,43 @@
 
 package pt.ualg.Car;
 
+import pt.ualg.Car.common.PrefEnum;
+import java.util.prefs.Preferences;
+import pt.ualg.Car.common.ParsingUtils;
+
 /**
  *
  * @author Joao Bispo
  */
-public enum Option {
+public enum Option implements PrefEnum {
 
    CalibrationWheelNeutralInt("93"),
    CalibrationTriggerNeutralInt("86"),
    CalibrationWheelSensitivityInt("3"),
-   CalibrationTriggerSensitivityInt("4");
+   CalibrationTriggerSensitivityInt("4"),
+   KeyMapWheelUp("76"), //KeyEvent.VK_L;
+   KeyMapWheelDown("74"), //KeyEvent.VK_J;
+   KeyMapTriggerUp("65"), //KeyEvent.VK_A;
+   KeyMapTriggerDown("90"), //KeyEvent.VK_Z;
+   CommPortNameString(null);
 
    private Option(String defaultValue) {
       this.defaultValue = defaultValue;
    }
 
    @Override
-   public String toString() {
+   public String defaultValue() {
       return defaultValue;
+   }
+
+   @Override
+   public Class<?> getClassValue() {
+      return classValue;
+   }
+
+   @Override
+   public String getName() {
+      return name();
    }
 
 
@@ -43,6 +62,7 @@ public enum Option {
    // INSTANCE VARIABLES
    //
    private final String defaultValue;
+   
    /**
     * This class value, for easier summoning of Preferences.
     */
