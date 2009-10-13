@@ -17,7 +17,7 @@
 
 package pt.ualg.Car.Controller;
 
-import pt.ualg.Car.Controller.ControllerMessage;
+import pt.ualg.Car.Controller.CarpadMessage;
 
 
 /**
@@ -25,7 +25,7 @@ import pt.ualg.Car.Controller.ControllerMessage;
  *
  * @author Joao Bispo
  */
-public interface ControllerMessageListener {
+public interface CarpadMessageListener {
 
-   public void processMessage(ControllerMessage message);
+   public void processMessage(CarpadMessage message);
 }

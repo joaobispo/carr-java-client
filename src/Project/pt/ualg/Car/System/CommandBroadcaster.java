@@ -17,9 +17,8 @@
 
 package pt.ualg.Car.System;
 
-import pt.ualg.Car.Controller.ControllerMessageListener;
-import pt.ualg.carr.gui3.*;
-import pt.ualg.Car.Controller.ControllerMessage;
+import pt.ualg.Car.Controller.CarpadMessageListener;
+import pt.ualg.Car.Controller.CarpadMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -28,15 +27,15 @@ import pt.amaze.ASL.TimeUtils;
 import pt.ualg.Car.common.Concurrent.ReadChannel;
 
 /**
- * Sends ControllerMessage objects to its Listeners.
+ * Sends CarpadMessage objects to its Listeners.
  *
  * @author Joao Bispo
  */
 public class CommandBroadcaster implements Runnable {
 
-   public CommandBroadcaster(ReadChannel<ControllerMessage> channel) {
+   public CommandBroadcaster(ReadChannel<CarpadMessage> channel) {
       this.channel = channel;
-      this.listeners = new ArrayList<ControllerMessageListener>();
+      this.listeners = new ArrayList<CarpadMessageListener>();
       this.run = false;
       receivedFirstMessage = false;
    }
@@ -81,7 +80,7 @@ public class CommandBroadcaster implements Runnable {
       run = true;
 
       // Try to receive the first message
-      ControllerMessage command = null;
+      CarpadMessage command = null;
       boolean isCommandNull = command == null;
       while(isCommandNull & run) {
          command = processCommand();
@@ -97,8 +96,8 @@ public class CommandBroadcaster implements Runnable {
    }
 
 
-   private ControllerMessage processCommand() {
-         ControllerMessage command = null;
+   private CarpadMessage processCommand() {
+         CarpadMessage command = null;
 
          // Listen to the channel, and send the command everytime one arrives.
          try {
@@ -112,7 +111,7 @@ public class CommandBroadcaster implements Runnable {
 
          // Send the command to all listeners
          if(command != null) {
-            for(ControllerMessageListener listener : listeners) {
+            for(CarpadMessageListener listener : listeners) {
                listener.processMessage(command);
             }
          }
@@ -125,7 +124,7 @@ public class CommandBroadcaster implements Runnable {
     *
     * @param listener
     */
-   public void addListener(ControllerMessageListener listener) {
+   public void addListener(CarpadMessageListener listener) {
       listeners.add(listener);
    }
 
@@ -136,8 +135,8 @@ public class CommandBroadcaster implements Runnable {
    /**
     * INSTANCE VARIABLES
     */
-   private ReadChannel<ControllerMessage> channel;
-   private List<ControllerMessageListener> listeners;
+   private ReadChannel<CarpadMessage> channel;
+   private List<CarpadMessageListener> listeners;
    private boolean run;
    private boolean receivedFirstMessage;
 

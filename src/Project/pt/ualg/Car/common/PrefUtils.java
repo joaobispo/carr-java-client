@@ -27,6 +27,42 @@ import java.util.prefs.Preferences;
  */
 public class PrefUtils {
 
+   public PrefUtils(Preferences preferences) {
+      this.preferences = preferences;
+   }
+
+
+   /**
+    * INSTANCE METHODS
+    */
+
+   /**
+    *
+    * @param option
+    * @return
+    */
+   public String getPref(PrefEnum option) {
+      return getPref(preferences, option);
+   }
+
+   public int getPrefInt(PrefEnum option) {
+      return getPrefInt(preferences, option);
+   }
+
+   public void putPref(PrefEnum option, Object value) {
+      putPref(preferences, option, value);
+   }
+
+   /**
+    * STATIC METHODS
+    */
+
+   /**
+    *
+    * @param prefs
+    * @param option
+    * @return
+    */
    public static String getPref(Preferences prefs, PrefEnum option) {
       return prefs.get(option.getName(), option.defaultValue());
    }
@@ -39,4 +75,9 @@ public class PrefUtils {
    public static void putPref(Preferences prefs, PrefEnum option, Object value) {
       prefs.put(option.getName(), value.toString());
    }
+
+   /**
+    * INSTANCE VARIABLES
+    */
+   private final Preferences preferences;
 }

@@ -21,7 +21,7 @@ package pt.ualg.Car.Controller;
  * Has information about the inputs received from the controller for the car.
  * @author Joao Bispo
  */
-public enum ControllerInput {
+public enum CarpadInput {
       SWITCH1("Analog 1"),
       SWITCH2("Analog 2"),
       SWITCH3("Analog 3"),
@@ -29,7 +29,7 @@ public enum ControllerInput {
       WHEEL("Wheel"),
       TRIGGER("Trigger");
 
-   private ControllerInput(String name) {
+   private CarpadInput(String name) {
       this.name = name;
    }
 
@@ -48,4 +48,5 @@ public enum ControllerInput {
 
       // Signal sent by CarPad indicating start of a package.
       public static final int COMMAND_START = 255;
+      public static final int NUMBER_OF_INPUTS = values().length;
 }

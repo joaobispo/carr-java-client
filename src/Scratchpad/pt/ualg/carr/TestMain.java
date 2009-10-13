@@ -42,7 +42,7 @@ import pt.amaze.ASL.LoggingUtils;
 import pt.ualg.Car.Controller.CarpadControllerPort;
 import pt.ualg.Car.Controller.CarpadControllerProtos.CarpadControllerData;
 import pt.ualg.Car.JavaDriver.Main;
-import pt.ualg.Car.Option;
+import pt.ualg.Car.JavaDriver.PrefCarpad;
 import pt.ualg.Car.common.LoggingUtils2;
 import pt.ualg.carr.client1.CarPadInput;
 import pt.ualg.carr.client1.Command;
@@ -622,13 +622,13 @@ String commPortName = "COM4";
       //String preferencePackage = "com.pt.ualg.Car";
       //Class className = Class.forName(preferencePackage);
       
-      //Preferences pref = Preferences.userNodeForPackage(Option.classValue);
-      Preferences pref = Option.getPreferences();
+      //Preferences pref = Preferences.userNodeForPackage(PrefCarpad.classValue);
+      Preferences pref = PrefCarpad.getPreferences();
       
       try {
          System.out.println(Arrays.toString(pref.keys()));
          // Store as String
-         //Option option = Option.CalibrationTriggerNeutralInt;
+         //PrefCarpad option = PrefCarpad.CalibrationTriggerNeutralInt;
          //pref.put(option.name(), option.defaultValue());
          // Retrive as Int
          //System.out.println(pref.getInt(option.name(), -1));
@@ -641,7 +641,7 @@ String commPortName = "COM4";
       }
 
       // Store as String
-      //Option option = Option.CalibrationTriggerNeutralInt;
+      //PrefCarpad option = PrefCarpad.CalibrationTriggerNeutralInt;
       //pref.put(option.name(), option.defaultValue());
 
       // Retrive as Int

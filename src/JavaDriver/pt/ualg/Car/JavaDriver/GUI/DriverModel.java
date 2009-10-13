@@ -19,16 +19,16 @@ package pt.ualg.Car.JavaDriver.GUI;
 
 import java.util.ArrayList;
 import java.util.List;
-import pt.ualg.Car.Controller.ControllerMessage;
+import pt.ualg.Car.Controller.CarpadMessage;
 import pt.ualg.Car.JavaDriver.System.DriverInput;
 import pt.ualg.Car.common.GuiUtils;
-import pt.ualg.Car.Controller.ControllerMessageListener;
+import pt.ualg.Car.Controller.CarpadMessageListener;
 
 /**
  *
  * @author Joao Bispo
  */
-public class DriverModel implements ControllerMessageListener {
+public class DriverModel implements CarpadMessageListener {
 
    public DriverModel() {
       listeners = new ArrayList<GuiListener>();
@@ -52,7 +52,7 @@ public class DriverModel implements ControllerMessageListener {
    }
    
    @Override
-   public void processMessage(final ControllerMessage message) {
+   public void processMessage(final CarpadMessage message) {
       // Run on the EDT so changes and reads to these values are sequencialized.
       GuiUtils.runOnEdt(new Runnable() {
 

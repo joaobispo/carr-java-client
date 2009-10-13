@@ -22,14 +22,14 @@ import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import pt.ualg.Car.Controller.ControllerMessage;
-import pt.ualg.Car.Controller.ControllerMessageListener;
+import pt.ualg.Car.Controller.CarpadMessage;
+import pt.ualg.Car.Controller.CarpadMessageListener;
 
 /**
  *
  * @author Joao Bispo
  */
-public class CommandToKeyboard implements ControllerMessageListener {
+public class CommandToKeyboard implements CarpadMessageListener {
 
    public CommandToKeyboard() {
       try {
@@ -46,7 +46,7 @@ public class CommandToKeyboard implements ControllerMessageListener {
    }
 
    @Override
-   public void processMessage(ControllerMessage message) {
+   public void processMessage(CarpadMessage message) {
       // Look at Wheel value
       int wheelValue = message.getAngles()[DriverInput.WHEEL.getControllerInputIndex()];
       processWheel(wheelValue);

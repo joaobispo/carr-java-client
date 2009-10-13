@@ -26,15 +26,15 @@ import java.util.Arrays;
  *
  * @author Joao Bispo
  */
-public class ControllerMessage {
+public class CarpadMessage {
 
    /**
-    * Creates a ControllerMessage object.
+    * Creates a CarpadMessage object.
     *
     * @param counter
     * @param angles
     */
-   public ControllerMessage(int[] angles) {
+   public CarpadMessage(int[] angles) {
       this.counter = newCounterValue();
       this.angles = Arrays.copyOf(angles, NUM_PORTS);
    }
@@ -83,7 +83,7 @@ public class ControllerMessage {
     */
    private int counter;
    private final int[] angles;
-   public final static int NUM_PORTS = ControllerInput.values().length;
+   public final static int NUM_PORTS = CarpadInput.values().length;
    
    private static int globalCounter = 0;
 

@@ -17,10 +17,10 @@
 
 package pt.ualg.carr.gui3;
 
-import pt.ualg.Car.Controller.ControllerMessageListener;
+import pt.ualg.Car.Controller.CarpadMessageListener;
 import java.util.logging.Logger;
-import pt.ualg.Car.Controller.ControllerInput;
-import pt.ualg.Car.Controller.ControllerMessage;
+import pt.ualg.Car.Controller.CarpadInput;
+import pt.ualg.Car.Controller.CarpadMessage;
 import pt.ualg.Car.common.GuiUtils;
 
 
@@ -28,10 +28,10 @@ import pt.ualg.Car.common.GuiUtils;
  *
  * @author Joao Bispo
  */
-public class GuiModel implements ControllerMessageListener {
+public class GuiModel implements CarpadMessageListener {
 
    public GuiModel() {
-      int numPorts = ControllerInput.values().length;
+      int numPorts = CarpadInput.values().length;
       portValues = new int[numPorts];
       mainScreen = new MainScreen();
       // Initialize Command Channel
@@ -110,7 +110,7 @@ public class GuiModel implements ControllerMessageListener {
     */
 
    @Override
-   public void processMessage(final ControllerMessage message) {
+   public void processMessage(final CarpadMessage message) {
       // Run on the EDT so changes and reads to these values are sequencialized.
       GuiUtils.runOnEdt(new Runnable() {
 
