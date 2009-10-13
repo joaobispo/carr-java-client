@@ -15,14 +15,16 @@
  *  under the License.
  */
 
-package pt.ualg.Car.JavaDriver;
+package pt.ualg.Car.JavaDriver.Controller;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
-import pt.ualg.Car.Controller.CarpadControllerPort;
+import pt.ualg.Car.Controller.CarpadMessage;
 import pt.ualg.Car.common.PrefUtils;
+import pt.ualg.Car.JavaDriver.PrefCarpad;
+import pt.ualg.Car.common.Concurrent.ReadChannel;
+import pt.ualg.Car.common.Concurrent.WriteChannel;
 
 /**
  * Runs and manages the CarpadController.
@@ -34,39 +36,45 @@ public class CarpadModule {
    public CarpadModule() {
       state = CarpadState.INITIALIZING;
       carpadExec = Executors.newSingleThreadExecutor();
-
+      carpad = new CarpadPort();
    }
-
-
 
    /**
-    * @return the name of the last stored name of the CommPort, or the default
-    * CommPort name if there is none stored.
+    *
+    * @return ReadChannel where messages from Carpad are written.
     */
-   private String loadCarpadPortName() {
-      Preferences preferences = PrefCarpad.getPreferences();
-      String carpadPortName = preferences.get(PrefCarpad.CommPortNameString.name(), null);
-      
-      if(carpadPortName == null) {
-         carpadPortName = CarpadControllerPort.defaultCommPortName();
-      }
-
-      return carpadPortName;
+   public ReadChannel getReadChannel() {
+      return channel.getReadChannel();
    }
 
-   private void storeCarpadPortName(String carpadPortName) {
-      prefs.putPref(PrefCarpad.CommPortNameString, carpadPortName);
+   public boolean activate() {
+      return false;
+   }
+
+   class Executable implements Runnable {
+
+      @Override
+      public void run() {
+         throw new UnsupportedOperationException("Not supported yet.");
+      }
+
    }
 
    /**
     * INSTANCE VARIABLES
     */
-   private CarpadState state;
+   // Channel to where the commands will be sent.
+   private WriteChannel<CarpadMessage> channel;
    // Carpad controller
-   private CarpadControllerPort carpad;
+   private CarpadPort carpad;
    // Thread that runs the CarpadController and generates the Controller Messages.
    // Executes the interface between the CarPad Controller and the message queue.
    private ExecutorService carpadExec;
+
+
+
+   private CarpadState state;
+
 
    // Utils
    private Logger logger = Logger.getLogger(CarpadModule.class.getName());

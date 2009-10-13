@@ -47,20 +47,22 @@ public class Tester {
       boolean connected = carpadPort.connect();
 
       System.out.println("connected? "+connected);
-      boolean run = true;
 
-      /*
-      while (run) {
-         try {
-            CarpadMessage message = carpadPort.readMessage();
+      
+      while (carpadPort.isConnected()) {
+         CarpadMessage message = carpadPort.readMessage();
+         if (message != null) {
             System.out.println(message.toString());
-         } catch (IOException ex) {
-            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            carpadPort.disconnect();
-            run = false;
          }
+
       }
-       */
+
+      // Try to connect again
+      while(!carpadPort.isConnected()) {
+         carpadPort.connect();
+      }
+
+       
 
       //carpadPort.disconnect();
    }
