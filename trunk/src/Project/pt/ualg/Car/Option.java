@@ -17,9 +17,8 @@
 
 package pt.ualg.Car;
 
-import pt.ualg.Car.common.PrefEnum;
+import pt.ualg.Car.common.Preferences.PrefEnum;
 import java.util.prefs.Preferences;
-import pt.ualg.Car.common.ParsingUtils;
 
 /**
  *
@@ -47,13 +46,12 @@ public enum Option implements PrefEnum {
    }
 
    @Override
-   public Class<?> getClassValue() {
-      return classValue;
-   }
-
-   @Override
    public String getName() {
       return name();
+   }
+
+   public static Preferences getPreferences() {
+      return Preferences.userNodeForPackage(Option.class);
    }
 
 

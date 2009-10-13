@@ -15,7 +15,7 @@
  *  under the License.
  */
 
-package pt.ualg.Car.common;
+package pt.ualg.Car.common.Preferences;
 
 /**
  *
@@ -25,5 +25,5 @@ public interface PrefEnum {
 
    public String getName();
    public String defaultValue();
-   public Class<?> getClassValue();
+
 }
