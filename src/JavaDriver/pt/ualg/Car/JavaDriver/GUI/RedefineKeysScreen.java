@@ -134,7 +134,7 @@ public class RedefineKeysScreen {
       Option.KeyMapTriggerDown
    };
 
-   private Preferences prefs = Preferences.userNodeForPackage(Option.classValue);
+   private Preferences prefs = Option.getPreferences();
 
    private static final int GAP = 5;   // Default gap btwn components.
 

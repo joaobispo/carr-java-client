@@ -622,7 +622,8 @@ String commPortName = "COM4";
       //String preferencePackage = "com.pt.ualg.Car";
       //Class className = Class.forName(preferencePackage);
       
-      Preferences pref = Preferences.userNodeForPackage(Option.classValue);
+      //Preferences pref = Preferences.userNodeForPackage(Option.classValue);
+      Preferences pref = Option.getPreferences();
       
       try {
          System.out.println(Arrays.toString(pref.keys()));

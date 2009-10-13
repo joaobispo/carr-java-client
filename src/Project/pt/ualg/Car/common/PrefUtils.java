@@ -17,6 +17,7 @@
 
 package pt.ualg.Car.common;
 
+import pt.ualg.Car.common.Preferences.PrefEnum;
 import java.util.prefs.Preferences;
 
 /**

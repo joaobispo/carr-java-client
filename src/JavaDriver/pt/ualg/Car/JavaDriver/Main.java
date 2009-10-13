@@ -312,7 +312,7 @@ public class Main implements Runnable, GuiListener {
 
    // Utils
    private Logger logger = Logger.getLogger(Main.class.getName());
-   private Preferences prefs = Preferences.userNodeForPackage(Option.classValue);
+   private Preferences prefs = Option.getPreferences();
 
 
 
