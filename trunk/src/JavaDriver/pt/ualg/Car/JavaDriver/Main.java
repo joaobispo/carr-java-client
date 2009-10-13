@@ -29,7 +29,6 @@ import pt.ualg.Car.JavaDriver.GUI.DriverModel;
 import pt.ualg.Car.JavaDriver.GUI.GuiAction;
 import pt.ualg.Car.JavaDriver.GUI.GuiListener;
 import pt.ualg.Car.JavaDriver.System.CommandToKeyboard;
-import pt.ualg.Car.Option;
 import pt.ualg.Car.System.CommandBroadcaster;
 import pt.ualg.Car.common.PrefUtils;
 
@@ -40,14 +39,19 @@ import pt.ualg.Car.common.PrefUtils;
 public class Main implements Runnable, GuiListener {
 
    public Main() {
+      carpadModule = new CarpadModule();
+
+      // BEGIN_DONE
       // Get carpadPortName - Using the preferences method so it can return null
       // if not found.
-      String commPortName = prefs.get(Option.CommPortNameString.name(), null);
+      String commPortName = prefs.get(PrefCarpad.CommPortNameString.name(), null);
       if(commPortName == null) {
          commPortName = CarpadControllerPort.defaultCommPortName();
       }
-
+      
       this.carpadPortName = commPortName;
+      // END_DONE
+
       mainState = null;
       carpad = null;
       messageQueue = new ArrayBlockingQueue<GuiAction>(1);
@@ -213,7 +217,7 @@ public class Main implements Runnable, GuiListener {
       String connectedCommPort = carpad.getCommPortName();
       if(connectedCommPort != null) {
          carpadPortName = connectedCommPort;
-         PrefUtils.putPref(prefs, Option.CommPortNameString, carpadPortName);
+         PrefUtils.putPref(prefs, PrefCarpad.CommPortNameString, carpadPortName);
       }
 
       // Wait for first message of broadcaster
@@ -298,12 +302,14 @@ public class Main implements Runnable, GuiListener {
    // Executes the interface between the CarPad Controller and the Broadcaster
    private ExecutorService messagesExec;
 
+   private CarpadModule carpadModule;
+
     // Broadcasts Controller Messages to whom it may concern (GUI and Car)
    private CommandBroadcaster broadcaster;
    // Executes the Broadcasts in another Thread
    private ExecutorService broadcasterExec;
 
-   // Translates the Carpad input into Keypresses
+   // Translates the Carpad Messages into Keypresses
    private CommandToKeyboard commandToKeyboard;
 
    // The GUI
@@ -312,7 +318,7 @@ public class Main implements Runnable, GuiListener {
 
    // Utils
    private Logger logger = Logger.getLogger(Main.class.getName());
-   private Preferences prefs = Option.getPreferences();
+   private Preferences prefs = PrefCarpad.getPreferences();
 
 
 

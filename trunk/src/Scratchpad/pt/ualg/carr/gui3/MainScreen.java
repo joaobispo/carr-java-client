@@ -24,7 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
-import pt.ualg.Car.Controller.ControllerInput;
+import pt.ualg.Car.Controller.CarpadInput;
 
 /**
  * Main screen of Car Client
@@ -34,7 +34,7 @@ import pt.ualg.Car.Controller.ControllerInput;
 public class MainScreen {
 
    public MainScreen() {
-      this.numInputs = ControllerInput.values().length;
+      this.numInputs = CarpadInput.values().length;
 
    }
 
@@ -56,7 +56,7 @@ public class MainScreen {
       inputsPanel.setLayout(new GridLayout(numInputs, 2));
       inputsPanel.setFocusable(false);
 
-      ControllerInput[] portNames = ControllerInput.values();
+      CarpadInput[] portNames = CarpadInput.values();
       for(int i=0; i<numInputs; i++) {
          // Create JTextFields
          jTextFields[i] = new JTextField();

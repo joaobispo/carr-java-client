@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import pt.amaze.ASL.TimeUtils;
 import pt.ualg.Car.common.Concurrent.ReadChannel;
@@ -56,7 +57,7 @@ public class CarpadControllerPort implements Runnable {
       }
 
       final int channelCapacity = 1;
-      this.channel = new WriteChannel<ControllerMessage>(channelCapacity);
+      this.channel = new WriteChannel<CarpadMessage>(channelCapacity);
       run = false;
       state = CarpadState.INITIALIZING;
    }
@@ -137,12 +138,37 @@ public class CarpadControllerPort implements Runnable {
          inputStream = serialPort.getInputStream();
          state = CarpadState.RUNNING;
          // Read input stream as fast as it can
+
+         // InputStream Test
+         //long firstNanos = System.nanoTime();
+         //boolean firstRun = true;
          while (run) {
+            // InputStream Test
+            /**
+            long interval = System.nanoTime() - firstNanos;
+
+            if(TimeUtils.nanosToMillis(interval) > 6000 && firstRun) {
+            
+            try {
+               // Sleep for a while, to see what happens too InputStream
+               Thread.sleep(5000);
+            } catch (InterruptedException ex) {
+               Logger.getLogger(CarpadControllerPort.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            firstRun = false;
+
+            }
+             */
+
+
             int readInt = inputStream.read();
 
             // If read number is commandStart, process package and put it in the queue.
             if (readInt == COMMAND_START) {
                processCommand(inputStream);
+            } else {
+
             }
             // If it is not, go to the next cycles, until it appears
 
@@ -183,7 +209,7 @@ public class CarpadControllerPort implements Runnable {
       }
 
       // Build the command object
-      ControllerMessage message = new ControllerMessage(angles);
+      CarpadMessage message = new CarpadMessage(angles);
 
       //Command command = new Command(packetCounter, angles);
       //packetCounter++;
@@ -454,16 +480,17 @@ public class CarpadControllerPort implements Runnable {
    private static final long INPUTSTREAM_TIMEOUT_NANOS = TimeUtils.millisToNanos(INPUTSTREAM_TIMEOUT_MILLIS);
    
    // Signal sent by CarPad indicating start of a package.
-   private static final int COMMAND_START = ControllerInput.COMMAND_START;
+   private static final int COMMAND_START = CarpadInput.COMMAND_START;
    // Number of inputs of the controller
-   private static final int NUMBER_OF_INPUTS = ControllerInput.numberOfInputs();
+   //private static final int NUMBER_OF_INPUTS = CarpadInput.numberOfInputs();
+   private static final int NUMBER_OF_INPUTS = CarpadInput.NUMBER_OF_INPUTS;
 
    // Name of the Communication Port
    private String commPortName;
    // Indicates if the object should run or not.
    private boolean run;
    // Channel to where the commands will be sent.
-   private WriteChannel<ControllerMessage> channel;
+   private WriteChannel<CarpadMessage> channel;
 
    private CarpadState state;
 

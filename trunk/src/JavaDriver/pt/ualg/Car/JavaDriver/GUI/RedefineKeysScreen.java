@@ -27,7 +27,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import pt.ualg.Car.Option;
+import pt.ualg.Car.JavaDriver.PrefCarpad;
 import pt.ualg.Car.common.ParsingUtils;
 import pt.ualg.Car.common.PrefUtils;
 
@@ -127,14 +127,14 @@ public class RedefineKeysScreen {
    "Trigger Action",
    "Trigger Reverse"};
 
-   private static final Option[] inputsMapping = {
-      Option.KeyMapWheelUp,
-      Option.KeyMapWheelDown,
-      Option.KeyMapTriggerUp,
-      Option.KeyMapTriggerDown
+   private static final PrefCarpad[] inputsMapping = {
+      PrefCarpad.KeyMapWheelUp,
+      PrefCarpad.KeyMapWheelDown,
+      PrefCarpad.KeyMapTriggerUp,
+      PrefCarpad.KeyMapTriggerDown
    };
 
-   private Preferences prefs = Option.getPreferences();
+   private Preferences prefs = PrefCarpad.getPreferences();
 
    private static final int GAP = 5;   // Default gap btwn components.
 

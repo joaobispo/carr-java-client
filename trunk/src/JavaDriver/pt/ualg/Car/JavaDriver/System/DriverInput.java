@@ -16,7 +16,7 @@
  */
 package pt.ualg.Car.JavaDriver.System;
 
-import pt.ualg.Car.Controller.ControllerInput;
+import pt.ualg.Car.Controller.CarpadInput;
 
 /**
  *
@@ -24,10 +24,10 @@ import pt.ualg.Car.Controller.ControllerInput;
  */
 public enum DriverInput {
 
-   WHEEL(ControllerInput.WHEEL),
-   TRIGGER(ControllerInput.TRIGGER);
+   WHEEL(CarpadInput.WHEEL),
+   TRIGGER(CarpadInput.TRIGGER);
 
-   private DriverInput(ControllerInput controllerInput) {
+   private DriverInput(CarpadInput controllerInput) {
       this.controllerInput = controllerInput;
    }
 
@@ -45,5 +45,5 @@ public enum DriverInput {
    /**
     * INSTANCE VARIABLES
     */
-   private final ControllerInput controllerInput;
+   private final CarpadInput controllerInput;
 }

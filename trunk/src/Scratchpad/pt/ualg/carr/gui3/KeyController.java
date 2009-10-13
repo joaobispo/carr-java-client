@@ -21,8 +21,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.logging.Logger;
-import pt.ualg.Car.Controller.ControllerInput;
-import pt.ualg.Car.Controller.ControllerMessage;
+import pt.ualg.Car.Controller.CarpadInput;
+import pt.ualg.Car.Controller.CarpadMessage;
 import pt.ualg.Car.common.Concurrent.ReadChannel;
 import pt.ualg.Car.common.Concurrent.WriteChannel;
 import pt.ualg.Car.common.GuiUtils;
@@ -35,9 +35,9 @@ import pt.ualg.Car.common.GuiUtils;
 public class KeyController extends KeyAdapter {
 
    public KeyController() {
-      angles = new int[ControllerMessage.NUM_PORTS];
+      angles = new int[CarpadMessage.NUM_PORTS];
 
-      // Initialize ControllerMessage Channel
+      // Initialize CarpadMessage Channel
       int channelCapacity = 1;
       keyboadValues = new WriteChannel<int[]>(channelCapacity);
       sendValues();
@@ -80,12 +80,12 @@ public class KeyController extends KeyAdapter {
 
       switch(keyCode) {
          case KeyEvent.VK_Q:
-            changeAngle(ControllerInput.WHEEL, Direction.UP);
+            changeAngle(CarpadInput.WHEEL, Direction.UP);
             changes = true;
             break;
 
          case KeyEvent.VK_A:
-            changeAngle(ControllerInput.WHEEL, Direction.DOWN);
+            changeAngle(CarpadInput.WHEEL, Direction.DOWN);
             changes = true;
             break;
       }
@@ -103,7 +103,7 @@ public class KeyController extends KeyAdapter {
     * @param i
     * @param direction
     */
-   private void changeAngle(final ControllerInput input, final Direction direction) {
+   private void changeAngle(final CarpadInput input, final Direction direction) {
 
       // Run on the EDT so changes and reads to these values are sequencialized.
       GuiUtils.runOnEdt(new Runnable() {
@@ -137,7 +137,7 @@ public class KeyController extends KeyAdapter {
     * @param value
     * @param change
     */
-   private int calculateAngle(int value, int change, ControllerInput input) {
+   private int calculateAngle(int value, int change, CarpadInput input) {
       //TODO Implement rules here, and init values on Input
       int tempValue = value + change;
 

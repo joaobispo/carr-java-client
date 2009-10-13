@@ -15,16 +15,18 @@
  *  under the License.
  */
 
-package pt.ualg.Car;
+package pt.ualg.Car.JavaDriver;
 
 import pt.ualg.Car.common.Preferences.PrefEnum;
 import java.util.prefs.Preferences;
+import pt.ualg.Car.common.PrefUtils;
 
 /**
+ * Preferences for the Carpad.
  *
  * @author Joao Bispo
  */
-public enum Option implements PrefEnum {
+public enum PrefCarpad implements PrefEnum {
 
    CalibrationWheelNeutralInt("93"),
    CalibrationTriggerNeutralInt("86"),
@@ -36,7 +38,7 @@ public enum Option implements PrefEnum {
    KeyMapTriggerDown("90"), //KeyEvent.VK_Z;
    CommPortNameString(null);
 
-   private Option(String defaultValue) {
+   private PrefCarpad(String defaultValue) {
       this.defaultValue = defaultValue;
    }
 
@@ -51,7 +53,15 @@ public enum Option implements PrefEnum {
    }
 
    public static Preferences getPreferences() {
-      return Preferences.userNodeForPackage(Option.class);
+      return Preferences.userNodeForPackage(PrefCarpad.class);
+   }
+
+   public static PrefUtils getPrefUtils() {
+      if(prefUtils == null) {
+         prefUtils = new PrefUtils(getPreferences());
+      }
+
+      return prefUtils;
    }
 
 
@@ -60,9 +70,10 @@ public enum Option implements PrefEnum {
    // INSTANCE VARIABLES
    //
    private final String defaultValue;
+   private static PrefUtils prefUtils = null;
    
    /**
     * This class value, for easier summoning of Preferences.
     */
-   public static final Class<?> classValue = pt.ualg.Car.Option.class;
+   public static final Class<?> classValue = pt.ualg.Car.JavaDriver.PrefCarpad.class;
 }
