@@ -17,10 +17,12 @@
 
 package pt.ualg.carr;
 
+import com.fluendo.player.Cortado;
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
+import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,6 +39,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import pt.amaze.ASL.DataManagement.DataMap;
 import pt.amaze.ASL.LoggingUtils;
 import pt.ualg.Car.Controller.CarpadControllerPort;
@@ -88,9 +92,11 @@ public class TestMain {
         //attachDetachKeyboard();
 
         //testGui3();
-        testJavaDriver();
+        //testJavaDriver();
         //testJavaDriverWithConfig();
         //testPreferences();
+
+        testCortado();
     }
 
    public static void testSerialComm() {
@@ -653,7 +659,51 @@ String commPortName = "COM4";
       //System.out.println(pref.get("net", null));
    }
 
+
+   private static void testCortado() {
+      JFrame frame = new JFrame();
+
+      Cortado cortado = new Cortado();
+cortado.setParam("url", "file://C:/Cortado/2008_Indy_500_video.ogv");
+//cortado.setParam("autoPlay", "true");
+cortado.setSize(352, 288);
+cortado.setVisible(true);
+      ExecutorService cortadoExec = Executors.newSingleThreadExecutor();
+      
+      cortadoExec.execute(cortado);
+      //cortadoExec.shutdown();
+
+
+
+/*
+String[][] params = cortado.getParameterInfo();
+      for(int i=0; i<params.length; i++) {
+         //System.out.println(params[i][0]);
+         System.out.println(i+"-"+"Param:"+params[i][0]+"; Value:"+cortado.getParam(params[i][0], "default"));
+         //System.out.println();
+      }
+*/
+/*
+      BorderLayout border = new BorderLayout(10, 10);
+      border.addLayoutComponent(cortado, BorderLayout.CENTER);
+
+
+      frame.setLayout(border);
+*/
+/*
+      frame.add(cortado);
+      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      frame.pack();
+      frame.setVisible(true);
+*/
+      //cortado.setVisible(true);
+   }
+
+
+
    private static Logger logger = Logger.getLogger(TestMain.class.getName());
+
+
 
 
 }

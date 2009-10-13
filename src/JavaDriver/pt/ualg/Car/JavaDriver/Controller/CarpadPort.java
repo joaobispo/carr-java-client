@@ -20,7 +20,6 @@ package pt.ualg.Car.JavaDriver.Controller;
 import gnu.io.SerialPort;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import pt.ualg.Car.Controller.CarpadInput;
@@ -117,35 +116,44 @@ public class CarpadPort {
    }
 
    /**
-    * Reads a message from the Carpad
+    * Reads a message from the Carpad. If there is any exception, the
+    * port disconnects immediately and automatically.
     *
     * @return a CarpadMessage, if it could read a message.
     * @throws IOException If there is any error while reading from the carpad.
     * Usually this means it has been compromised and object should be shutdown.
     */
-   public CarpadMessage readMessage() throws IOException {
+   public CarpadMessage readMessage() {
       if(!isConnected) {
          logger.warning("Trying to read message from Carpad without being connected.");
-         throw new IOException();
+         return null;
       }
 
       if(inputStream == null) {
          logger.warning("Trying to read message from Carpad, but inputstream is closed.");
-         throw new IOException();
+         return null;
       }
 
       // Read first
       int counter = 0;
 
-      while(counter < READ_MESSAGE_MAX_DROPS) {
-      int readInt = inputStream.read();
+      while (counter < READ_MESSAGE_MAX_DROPS) {
+         try {
+            int readInt = inputStream.read();
+
             // If read number is commandStart, process package and put it in the queue.
             if (readInt == CarpadInput.COMMAND_START) {
                return processCommand(inputStream);
             } else {
                counter++;
             }
+         } catch (IOException ex) {
+            logger.warning("IOException while reading CarpadPort - CarpadPort disconnected (1)");
+            disconnect();
+            return null;
+         }
       }
+
 
       logger.warning("Could not read message from Carpad.");
       
@@ -155,13 +163,19 @@ public class CarpadPort {
    /**
     * Creates and returns a Command object.
     */
-   private CarpadMessage processCommand(InputStream inputStream) throws IOException {
+   private CarpadMessage processCommand(InputStream inputStream) {
       // Create array for inputs
       int[] angles = new int[CarpadInput.NUMBER_OF_INPUTS];
 
       // Read as many commands as necessary
       for(int i=0; i<CarpadInput.NUMBER_OF_INPUTS; i++) {
+         try {
             angles[i] = inputStream.read();
+         } catch (IOException ex) {
+            logger.warning("IOException while reading CarpadPort - CarpadPort disconnected (2)");
+            disconnect();
+            return null;
+         }
       }
 
       // Build the command object
@@ -190,6 +204,12 @@ public class CarpadPort {
    private void storeCarpadPortName(String carpadPortName) {
       prefs.putPref(PrefCarpad.CommPortNameString, carpadPortName);
    }
+
+   public boolean isConnected() {
+      return isConnected;
+   }
+
+
 
    /**
     * INSTANCE VARIABLES
