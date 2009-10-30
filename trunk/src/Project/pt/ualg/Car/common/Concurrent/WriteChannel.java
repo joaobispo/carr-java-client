@@ -17,6 +17,7 @@
 
 package pt.ualg.Car.common.Concurrent;
 
+import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -56,6 +57,18 @@ public class WriteChannel<T> {
       return channel.offer(e, timeout, unit);
    }
    
+   /**
+    * Empties the channel.
+    */
+   public void clear() {
+      T t = channel.poll();
+
+      while(t != null) {
+         t = channel.poll();
+      }
+      //channel.drainTo(new ArrayList<T>(channel.size()));
+   }
+
    /**
     * INSTANCE VARIABLES
     */

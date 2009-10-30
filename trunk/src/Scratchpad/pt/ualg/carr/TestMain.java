@@ -81,7 +81,7 @@ public class TestMain {
 
        //testCarPadInput();
 
-        //testGui2();
+        testGui2();
 
        //testProgramV1();
        //testInputInterruption();
@@ -96,7 +96,7 @@ public class TestMain {
         //testJavaDriverWithConfig();
         //testPreferences();
 
-        testCortado();
+        //testCortado();
     }
 
    public static void testSerialComm() {
