@@ -42,7 +42,8 @@ public class CarpadPort {
    }
 
    /**
-    * Attempts to connect to the Carpad through the serial port.
+    * Attempts to connect to the Carpad through the serial port. Blocks until
+    * it is connected or it couldn't connect.
     * 
     * @return true if it could connect, false otherwise.
     */
@@ -120,8 +121,6 @@ public class CarpadPort {
     * port disconnects immediately and automatically.
     *
     * @return a CarpadMessage, if it could read a message.
-    * @throws IOException If there is any error while reading from the carpad.
-    * Usually this means it has been compromised and object should be shutdown.
     */
    public CarpadMessage readMessage() {
       if(!isConnected) {
