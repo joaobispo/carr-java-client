@@ -34,15 +34,31 @@ public class Command {
          Logger.getLogger(Command.class.getName()).warning(
                  "Array size ("+values.length+") different of expected size " +
                  "("+expectedSize+"). Building Command with empty array");
+         this.isValid = false;
       } else {
          this.values = values;
+         this.isValid = true;
       }
+   }
+
+   /**
+    * Constructor for building Invalid Commands
+    */
+   private Command() {
+      int expectedSize = CommandVariable.values().length;
+      this.values = new int[expectedSize];
+      this.isValid = false;
    }
 
    /**
     * @return the internal array of the command
     */
    public int[] getValues() {
+      if(!isValid) {
+           Logger.getLogger(Command.class.getName()).warning(
+                 "Accessing values of a Command with INVALID status.");
+      }
+
       return values;
    }
 
@@ -52,13 +68,35 @@ public class Command {
     * @return the respective value.
     */
    public int getValue(CommandVariable var) {
+      if (!isValid) {
+         Logger.getLogger(Command.class.getName()).warning(
+                 "Accessing value " + var + " of a Command with INVALID status.");
+      }
+
       return values[var.getIndex()];
    }
 
+   /**
+    * An invalid Command is used to signal that the CommandSource
+    * is not connected, or that is not producing valid Command objects.
+    * 
+    * @return true if it is a valid Command, false otherwise.
+    */
+   public boolean isValid() {
+      return isValid;
+   }
 
+   /**
+    * 
+    * @return a new Command object with invalid status.
+    */
+   public static Command buildInvalidCommand() {
+      return new Command();
+   }
 
    /**
     * INSTANCE VARIABLES
     */
    private final int[] values;
+   private final boolean isValid;
 }
