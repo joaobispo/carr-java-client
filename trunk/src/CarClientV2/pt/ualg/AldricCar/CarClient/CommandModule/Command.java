@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 public class Command {
 
    public Command(int[] values) {
-      int expectedSize = CommandVariable.values().length;
+      int expectedSize = CommandArrayVariable.getArraySize();
 
       if(values.length != expectedSize) {
          this.values = new int[expectedSize];
@@ -45,7 +45,7 @@ public class Command {
     * Constructor for building Invalid Commands
     */
    private Command() {
-      int expectedSize = CommandVariable.values().length;
+      int expectedSize = CommandArrayVariable.getArraySize();
       this.values = new int[expectedSize];
       this.isValid = false;
    }
@@ -67,7 +67,7 @@ public class Command {
     * @param var
     * @return the respective value.
     */
-   public int getValue(CommandVariable var) {
+   public int getValue(CommandArrayVariable var) {
       if (!isValid) {
          Logger.getLogger(Command.class.getName()).warning(
                  "Accessing value " + var + " of a Command with INVALID status.");
