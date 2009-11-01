@@ -17,6 +17,11 @@
 
 package pt.ualg.AldricCar.CarClient.CarpadModule;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Ancora Group <ancora.codigo@gmail.com>
@@ -27,7 +32,94 @@ public class Tester {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        testLoopWithoutExceptions();
+        testLoopWithException();
     }
+
+    
+   private static void testLoopWithoutExceptions() {
+      Runnable runnable = new Runnable() {
+
+         public void run() {
+            long counter = 0;
+            final long divisible = 1000000;
+            boolean running = true;
+
+            while(running) {
+               if(counter % divisible == 0) {
+                  System.out.println("testLoopWithoutExceptions");
+               }
+               counter ++;
+
+               // Check if thread was interrupted
+               if(running) {
+                  if(Thread.currentThread().isInterrupted()) {
+                     running = false;
+                  }
+               }
+            }
+         }
+
+      };
+
+      ExecutorService carpadExec = Executors.newSingleThreadExecutor();
+      carpadExec.submit(runnable);
+
+      
+      try {
+         //Sleep a little
+         Thread.sleep(2000);
+      } catch (InterruptedException ex) {
+         Logger.getLogger(Tester.class.getName()).log(Level.SEVERE, null, ex);
+         Thread.currentThread().interrupt();
+      }
+       
+
+      carpadExec.shutdownNow();
+
+   }
+
+   // Needs serialport and inputstream to be tested
+   private static void testLoopWithException() {
+      Runnable runnable = new Runnable() {
+
+         public void run() {
+            long counter = 0;
+            final long divisible = 1000000;
+            boolean running = true;
+
+            while(running) {
+
+               if(counter % divisible == 0) {
+                  System.out.println("testLoopWithoutExceptions");
+               }
+               counter ++;
+
+               // Check if thread was interrupted
+               if(running) {
+                  if(Thread.currentThread().isInterrupted()) {
+                     running = false;
+                  }
+               }
+            }
+         }
+
+      };
+
+      ExecutorService carpadExec = Executors.newSingleThreadExecutor();
+      carpadExec.submit(runnable);
+
+
+      try {
+         //Sleep a little
+         Thread.sleep(2000);
+      } catch (InterruptedException ex) {
+         Logger.getLogger(Tester.class.getName()).log(Level.SEVERE, null, ex);
+         Thread.currentThread().interrupt();
+      }
+
+
+      carpadExec.shutdownNow();
+   }
 
 }

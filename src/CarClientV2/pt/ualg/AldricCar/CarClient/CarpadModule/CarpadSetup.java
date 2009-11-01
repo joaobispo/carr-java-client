@@ -15,37 +15,32 @@
  *  under the License.
  */
 
-package pt.ualg.AldricCar.CarClient.CommandModule;
+package pt.ualg.AldricCar.CarClient.CarpadModule;
+
+import pt.ualg.AldricCar.CarClient.CommandModule.CommandArrayVariable;
 
 /**
- * Enum representing the variables inside the command.
- * 
+ * Contains information about the Carpad, such as the value of the preamble
+ * and by which order it sends the variables.
+ *
  * @author Joao Bispo
  */
-public enum CommandVariable {
-
-   COUNTER(0),
-   ANALOG1(1),
-   ANALOG2(2),
-   ANALOG3(3),
-   ANALOG4(4),
-   WHEEL(5),
-   TRIGGER(6);
-
-   private CommandVariable(int index) {
-      this.index = index;
-   }
-
+public interface CarpadSetup {
    /**
-    * @return the index associated with the variable.
+    * The value of the preamble.
     */
-   public int getIndex() {
-      return index;
-   }
+    int PREAMBLE = 255;
 
+    /**
+     * The order by which the Carpad sends the inputs.
+     */
+   CommandArrayVariable[] INPUTS = {
+      CommandArrayVariable.ANALOG1,
+      CommandArrayVariable.ANALOG2,
+      CommandArrayVariable.ANALOG3,
+      CommandArrayVariable.ANALOG4,
+      CommandArrayVariable.WHEEL,
+      CommandArrayVariable.TRIGGER,
+   };
 
-   /**
-    * INSTANCE VARIABLE
-    */
-   private final int index;
 }
