@@ -97,6 +97,7 @@ public class TestMain {
         //testPreferences();
 
         //testCortado();
+        testModuloSubtraction();
     }
 
    public static void testSerialComm() {
@@ -702,6 +703,15 @@ String[][] params = cortado.getParameterInfo();
 
 
    private static Logger logger = Logger.getLogger(TestMain.class.getName());
+
+   private static void testModuloSubtraction() {
+        System.out.println("Integer Max    :"+Integer.toBinaryString(Integer.MAX_VALUE));
+        System.out.println("Integer Max + 1:"+Integer.toBinaryString(Integer.MAX_VALUE + 1));
+        System.out.println("Integer Min    :"+Integer.toBinaryString(3-(-1)));
+        //System.out.println("Tudo 1s        :"+Integer.valueOf("11111111111111111111111111111111", 2));
+        //System.out.println(1 - Integer.MAX_VALUE);
+        //System.out.println(Integer.MAX_VALUE + 2);
+   }
 
 
 
