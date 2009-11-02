@@ -50,6 +50,12 @@ public class CarpadReader implements Runnable {
    }
 
    /**
+    * While the thread is inactive, the ReadChannel will be empty.
+    * If active and running in a thread, it will return the values from the
+    * Carpad.
+    * If for any reason the thread terminates, ReadChannel will become empty
+    * again.
+    *
     * @return a ReadChannel from where we can read the values from the Carpad.
     */
    public ReadChannel<int[]>  getReadChannel() {
@@ -59,8 +65,14 @@ public class CarpadReader implements Runnable {
    /**
     * If in NOT_ACTIVE state, attempts a connection to the given <tt>portName</tt>.
     * If a connection is possible, object is put in ACTIVE state.
-    * <p>Before connecting, the method tests if the given <tt>portName</tt>
+    *
+    * <p> Before connecting, the method tests if the given <tt>portName</tt>
     * gives a correct stream of inputs.
+    *
+    * <p> After the object is ACTIVE, it can only go back to NOT_ACTIVE if it is
+    * run in a thread and the thread terminates. The thread terminates if it is
+    * interrupted, or if there is an exception inside the thread
+    * (such as loss of connection).
     *
     * @param portName name of the port where Carpad is connected.
     * @return Returns true if it could connect to the port. If it couldn't connect,
@@ -107,7 +119,7 @@ public class CarpadReader implements Runnable {
    /**
     * If in ACTIVE state, liberates resources associated with the object and puts the object in NOT_ACTIVE state. As any of the methods of the object, it can only be called if object is currently not running in another thread.
     */
-   public void deactivate() {
+   private void deactivate() {
       // Check state
       if (!isActive) {
          logger.warning("CarpadRead is inactive, it can't be deactivated.");
@@ -127,7 +139,7 @@ public class CarpadReader implements Runnable {
     *
     * <p>If the Channel is already full, the array is discarded.
     * If connection is lost, or values could not be read, the loop terminates
-    * but resources are not liberated.
+    * and resources are liberated.
     */
    public void run() {
       // Check if state is ACTIVE
@@ -139,25 +151,24 @@ public class CarpadReader implements Runnable {
       int droppedValues = 0;
       int totalValues = 0;
 
+      /*
+      try {
+         int a = inputStream.read();
+      } catch (IOException ex) {
+         Logger.getLogger(CarpadReader.class.getName()).log(Level.SEVERE, null, ex);
+      }
+       */
+
       // Run while the thread is not interrupted
       boolean isRunning = true;
       while(isRunning) {
          try {
             // Read an array of values from the Carpad
-            final int[] values = readValues(inputStream, logger);
-            System.out.println("Read Values:" + Arrays.toString(values));
-
-            /*
-            // Check if values could be read
-            if (values == null) {
-               System.out.println("Null values.");
-               isRunning = false;
-               break;
-            }
-             */
+            int[] values = readValues(inputStream, logger);
             
             // Put the values on the channel
             boolean operationSuccessful = writeChannel.offer(values);
+            
             // Dropping Statistics
             if (!operationSuccessful) {
                droppedValues++;
@@ -174,12 +185,14 @@ public class CarpadReader implements Runnable {
                totalValues = 0;
                droppedValues = 0;
             }
+
             // Check if thread was interrupted
             if (Thread.currentThread().isInterrupted()) {
                isRunning = false;
             }
+            
          } catch (IOException ex) {
-            logger.warning("IOException while trying to read values from Carpad");
+            logger.warning("IOException while trying to read values from Carpad. Going back to NOT_ACTIVE state.");
             isRunning = false;
          }
       }
@@ -223,7 +236,6 @@ public class CarpadReader implements Runnable {
     * @return an array of ints with the values of the controller.
     */
    private static int[] readValues(InputStream inputStream, Logger logger) throws IOException {
-      System.out.println("Inside readValues");
       // Number of inputs
       final int numInputs = CarpadSetup.INPUTS.length;
 
@@ -232,22 +244,11 @@ public class CarpadReader implements Runnable {
 
       // Read Preamble
       int preamble = inputStream.read();
-      //System.out.println("preamble:"+preamble);
 
       if(preamble != CarpadSetup.PREAMBLE) {
-         System.out.println("Out of phase (1): "+preamble);
          // Put inputStream in phase (read values until a preamble appears)
-         putInputstreamInPhase(inputStream, logger);
+         putInputStreamInPhase(inputStream, logger);
       }
-
-      // Check if inputStream is in phase
-      /*
-      boolean isInPhase = putInputstreamInPhase(inputStream, logger);
-      if(!isInPhase) {
-         logger.warning("Could not get InputStream in phase.");
-         return null;
-      }
-       */
 
       // Stream is now in phase. Read the values into the array.
       for(int i=0; i<numInputs; i++) {
@@ -267,7 +268,7 @@ public class CarpadReader implements Runnable {
     *
     * @return true if inputStream could be put in phase. False otherwise.
     */
-   private static void putInputstreamInPhase(InputStream inputStream, Logger logger) throws IOException {
+   private static void putInputStreamInPhase(InputStream inputStream, Logger logger) throws IOException {
       // Number of inputs
       final int numInputs = CarpadSetup.INPUTS.length;
 
@@ -277,7 +278,6 @@ public class CarpadReader implements Runnable {
       int value = inputStream.read();
 
       while (value != CarpadSetup.PREAMBLE) {
-         System.out.println("Out of phase:" + value);
          // Check if counter has reached maximum value
          if (counter > numInputs) {
             logger.warning("Could not get InputStream in phase.");

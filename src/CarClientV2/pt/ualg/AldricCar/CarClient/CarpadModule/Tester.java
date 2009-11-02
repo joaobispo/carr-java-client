@@ -49,7 +49,7 @@ public class Tester {
    private static void init() {
       // Logging
        LoggingUtils.setupConsoleOnly();
-       //pt.amaze.ASLCandidates.LoggingUtils.redirectSystemOut();
+       pt.amaze.ASLCandidates.LoggingUtils.redirectSystemOut();
        pt.amaze.ASLCandidates.LoggingUtils.redirectSystemErr();
 
        boolean librariesExist = RxtxUtils.rxtxLibrariesExists();
@@ -164,9 +164,17 @@ public class Tester {
    }
 
    private static void testCarpadReader() {
+      String portName = CarpadUtils.findCarpadPortName();
+      
+      if(portName == null) {
+         System.out.println("Could not find port.");
+         return;
+      }
+
       CarpadReader carpadReader = new CarpadReader();
       ReadChannel<int[]> channel = carpadReader.getReadChannel();
-      carpadReader.activate("COM4");
+      carpadReader.activate(portName);
+      //carpadReader.activate("COM4");
       
       ExecutorService exec = Executors.newSingleThreadExecutor();
       exec.submit(carpadReader);
@@ -174,29 +182,46 @@ public class Tester {
 
       // Read values
       int counter = 0;
-      while(counter < 10) {
+      while(counter < 100 && !exec.isTerminated()) {
          try {
+            // First read needs more time.
             int[] values = channel.poll(2000, TimeUnit.MILLISECONDS);
-            //System.out.println("Values:"+Arrays.toString(values));
+            System.out.println("Values:"+Arrays.toString(values));
          } catch (InterruptedException ex) {
             Logger.getLogger(Tester.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Message took more than one second.");
          }
 
          counter++;
       }
 
-      System.out.println("Going to shutdown forcibly.");
-
-      /*
+      System.out.println("Carpad Stopped. Trying to connect again after six seconds.");
       try {
-         //carpadReader.deactivate();
-         Thread.sleep(1000);
+         Thread.sleep(6000);
       } catch (InterruptedException ex) {
          Logger.getLogger(Tester.class.getName()).log(Level.SEVERE, null, ex);
-         Thread.currentThread().interrupt();
       }
-       */
+
+      //if(!carpadReader.activate("COM4")) {
+      if(!carpadReader.activate(portName)) {
+         System.out.println("Second chance.");
+         //carpadReader.activate("COM4");
+         carpadReader.activate(portName);
+      }
+      exec = Executors.newSingleThreadExecutor();
+      exec.submit(carpadReader);
+      exec.shutdown();
+
+      int[] values;
+      try {
+         values = channel.poll(2000, TimeUnit.MILLISECONDS);
+            System.out.println("Values:"+Arrays.toString(values));
+      } catch (InterruptedException ex) {
+         Logger.getLogger(Tester.class.getName()).log(Level.SEVERE, null, ex);
+      }
+
+      /*
+      System.out.println("Going to shutdown forcibly.");
+
 
       exec.shutdownNow();
       try {
@@ -205,8 +230,8 @@ public class Tester {
          Logger.getLogger(Tester.class.getName()).log(Level.SEVERE, null, ex);
          Thread.currentThread().interrupt();
       }
-
-      //carpadReader.deactivate();
+      */
+      
    }
 
 
