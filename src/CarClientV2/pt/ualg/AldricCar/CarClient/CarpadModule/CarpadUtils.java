@@ -169,30 +169,12 @@ public class CarpadUtils {
 
       }
 
-      // Check for the following pattern:
-      // 255 ([number] [number] ...){number of inputs} 255 ...
-
-      //TODO: Is this part necessary? Didn't we already find a 255 in the
-      // last block of code?
-
-      // Search for a 255 inside an interval of numbers
-      int period = CarpadSetup.INPUTS.length;
-      /*
       
-      int periodCounter = 0;
-      while(readInt != 255) {
-         readInt = inputStream.read();
-         periodCounter++;
-
-         // Check if it already passed the time a 255 should have appeard.
-         if(periodCounter > period ) {
-            return false;
-         }
-      }
-       */
-
-      // Found a 255. Check if the next X numbers are not 255, and then appears
+      // Found the Preamble. Check for the following pattern:
+      // Preamble ([number] [number] ...){number of inputs} Preamble ...
+      // In other words, check if the next X numbers are not 255, and then appears
       // a 255 again
+      int period = CarpadSetup.INPUTS.length;
       for(int i=0; i<period; i++) {
          readInt = inputStream.read();
          if(readInt == 255) {
