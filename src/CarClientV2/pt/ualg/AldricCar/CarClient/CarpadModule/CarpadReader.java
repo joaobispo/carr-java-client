@@ -21,6 +21,7 @@ import gnu.io.SerialPort;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import pt.amaze.ASLCandidates.Concurrent.ReadChannel;
 import pt.amaze.ASLCandidates.Concurrent.WriteChannel;
@@ -141,41 +142,44 @@ public class CarpadReader implements Runnable {
       // Run while the thread is not interrupted
       boolean isRunning = true;
       while(isRunning) {
-         // Read an array of values from the Carpad
-         final int[] values = readValues(inputStream, logger);
-         System.out.println("Read Values:"+Arrays.toString(values));
+         try {
+            // Read an array of values from the Carpad
+            final int[] values = readValues(inputStream, logger);
+            System.out.println("Read Values:" + Arrays.toString(values));
 
-         // Check if values could be read
-         if(values == null) {
-            System.out.println("Null values.");
-            isRunning = false;
-            break;
-         }
-
-         // Put the values on the channel
-         boolean operationSuccessful = writeChannel.offer(values);
-
-         // Dropping Statistics
-         if(!operationSuccessful) {
-            droppedValues++;
-         }
-         totalValues++;
-
-         // Check if dropped packets achieved threshold
-         if(totalValues >= SAMPLE_SIZE) {
-            if(droppedValues >= WARNING_RATE_THRESHOLD) {
-               float rate = (float)droppedValues / (float)totalValues;
-               int roundedRate = (int) (rate * 100);
-               logger.info("Carpad values dropping rate at "+roundedRate+"%");
+            /*
+            // Check if values could be read
+            if (values == null) {
+               System.out.println("Null values.");
+               isRunning = false;
+               break;
             }
-
-            // Reset values
-            totalValues = 0;
-            droppedValues = 0;
-         }
-
-         // Check if thread was interrupted
-         if(Thread.currentThread().isInterrupted()) {
+             */
+            
+            // Put the values on the channel
+            boolean operationSuccessful = writeChannel.offer(values);
+            // Dropping Statistics
+            if (!operationSuccessful) {
+               droppedValues++;
+            }
+            totalValues++;
+            // Check if dropped packets achieved threshold
+            if (totalValues >= SAMPLE_SIZE) {
+               if (droppedValues >= WARNING_RATE_THRESHOLD) {
+                  float rate = (float) droppedValues / (float) totalValues;
+                  int roundedRate = (int) (rate * 100);
+                  logger.info("Carpad values dropping rate at " + roundedRate + "%");
+               }
+               // Reset values
+               totalValues = 0;
+               droppedValues = 0;
+            }
+            // Check if thread was interrupted
+            if (Thread.currentThread().isInterrupted()) {
+               isRunning = false;
+            }
+         } catch (IOException ex) {
+            logger.warning("IOException while trying to read values from Carpad");
             isRunning = false;
          }
       }
@@ -218,7 +222,7 @@ public class CarpadReader implements Runnable {
     *
     * @return an array of ints with the values of the controller.
     */
-   private static int[] readValues(InputStream inputStream, Logger logger) {
+   private static int[] readValues(InputStream inputStream, Logger logger) throws IOException {
       System.out.println("Inside readValues");
       // Number of inputs
       final int numInputs = CarpadSetup.INPUTS.length;
@@ -226,21 +230,28 @@ public class CarpadReader implements Runnable {
       // Create return array
       final int[] values = new int[numInputs];
 
+      // Read Preamble
+      int preamble = inputStream.read();
+      //System.out.println("preamble:"+preamble);
+
+      if(preamble != CarpadSetup.PREAMBLE) {
+         System.out.println("Out of phase (1): "+preamble);
+         // Put inputStream in phase (read values until a preamble appears)
+         putInputstreamInPhase(inputStream, logger);
+      }
+
       // Check if inputStream is in phase
+      /*
       boolean isInPhase = putInputstreamInPhase(inputStream, logger);
       if(!isInPhase) {
          logger.warning("Could not get InputStream in phase.");
          return null;
       }
+       */
 
       // Stream is now in phase. Read the values into the array.
       for(int i=0; i<numInputs; i++) {
-         try {
             values[i] = inputStream.read();
-         } catch (IOException ex) {
-            logger.warning("IOException while reading Carpad values");
-            return null;
-         }
       }
 
       // Return values
@@ -256,36 +267,28 @@ public class CarpadReader implements Runnable {
     *
     * @return true if inputStream could be put in phase. False otherwise.
     */
-   private static boolean putInputstreamInPhase(InputStream inputStream, Logger logger) {
+   private static void putInputstreamInPhase(InputStream inputStream, Logger logger) throws IOException {
       // Number of inputs
       final int numInputs = CarpadSetup.INPUTS.length;
 
-      try {
-         int value = inputStream.read();
-         if (value != CarpadSetup.PREAMBLE) {
-            System.out.println("Is not in phase.");
-            System.out.println("Out of phase:"+value);
-            // It is not in phase. Read up to a maximum of the number of inputs,
-            // until preable value appears.
-            int counter = 0;
-            while (value != CarpadSetup.PREAMBLE) {
-               // Check if counter has reached maximum value
-               if (counter > numInputs) {
-                  logger.warning("Could not get InputStream in phase.");
-                  return false;
-               }
+      // It is not in phase. Read up to a maximum of the number of inputs,
+      // until preable value appears.
+      int counter = 0;
+      int value = inputStream.read();
 
-               value = inputStream.read();
-               System.out.println("Out of phase:"+value);
-            }
+      while (value != CarpadSetup.PREAMBLE) {
+         System.out.println("Out of phase:" + value);
+         // Check if counter has reached maximum value
+         if (counter > numInputs) {
+            logger.warning("Could not get InputStream in phase.");
+            throw new IOException("Could not get InputStream in phase.");
          }
-      } catch (IOException ex) {
-         logger.warning("IOException while tring to get inputstream in phase.");
-         return false;
-      }
 
-      return true;
+         value = inputStream.read();
+         counter++;
+      }
    }
+
 
    /**
     * INSTANCE VARIABLES

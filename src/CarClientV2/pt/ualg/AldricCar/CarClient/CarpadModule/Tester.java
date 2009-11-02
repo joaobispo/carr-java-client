@@ -186,8 +186,9 @@ public class Tester {
          counter++;
       }
 
-      System.out.println("In one second, going to shutdown forcibly.");
+      System.out.println("Going to shutdown forcibly.");
 
+      /*
       try {
          //carpadReader.deactivate();
          Thread.sleep(1000);
@@ -195,6 +196,7 @@ public class Tester {
          Logger.getLogger(Tester.class.getName()).log(Level.SEVERE, null, ex);
          Thread.currentThread().interrupt();
       }
+       */
 
       exec.shutdownNow();
       try {
@@ -203,7 +205,8 @@ public class Tester {
          Logger.getLogger(Tester.class.getName()).log(Level.SEVERE, null, ex);
          Thread.currentThread().interrupt();
       }
-      carpadReader.deactivate();
+
+      //carpadReader.deactivate();
    }
 
 
