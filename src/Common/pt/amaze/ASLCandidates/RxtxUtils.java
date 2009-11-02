@@ -37,6 +37,7 @@ public class RxtxUtils {
 
    /**
     * Tries to opens the serial port with name “portName”.
+    * If a connection is not possible, the event is logged.
     *
     * <p>It uses as parameters:
     * <br> Baudrate: 9600;
@@ -83,6 +84,12 @@ public class RxtxUtils {
       } catch (UnsupportedCommOperationException e) {
          Logger.getLogger(RxtxUtils.class.getName()).
                  warning("Serial Port '" + portName + "' could not be setup.");
+         return null;
+      }
+
+      if(serialPort == null) {
+         Logger.getLogger(RxtxUtils.class.getName()).
+                 warning("Could not connect to Serial Port '"+portName+"'.");
          return null;
       }
 

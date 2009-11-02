@@ -17,11 +17,14 @@
 
 package pt.ualg.AldricCar.CarClient.CarpadModule;
 
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import pt.amaze.ASL.LoggingUtils;
+import pt.amaze.ASLCandidates.Concurrent.ReadChannel;
 import pt.amaze.ASLCandidates.RxtxUtils;
 
 /**
@@ -38,14 +41,15 @@ public class Tester {
 
         //testLoopWithoutExceptions();
         //testLoopWithException();
-       testCarpadUtils();
+       //testCarpadUtils();
+       testCarpadReader();
     }
 
 
    private static void init() {
       // Logging
        LoggingUtils.setupConsoleOnly();
-       pt.amaze.ASLCandidates.LoggingUtils.redirectSystemOut();
+       //pt.amaze.ASLCandidates.LoggingUtils.redirectSystemOut();
        pt.amaze.ASLCandidates.LoggingUtils.redirectSystemErr();
 
        boolean librariesExist = RxtxUtils.rxtxLibrariesExists();
@@ -156,6 +160,50 @@ public class Tester {
       String carpadPortName = "COM4";
       boolean detected = CarpadUtils.testCarpadPort(carpadPortName);
       System.out.println(detected);
+      
+   }
+
+   private static void testCarpadReader() {
+      CarpadReader carpadReader = new CarpadReader();
+      ReadChannel<int[]> channel = carpadReader.getReadChannel();
+      carpadReader.activate("COM4");
+      
+      ExecutorService exec = Executors.newSingleThreadExecutor();
+      exec.submit(carpadReader);
+      exec.shutdown();
+
+      // Read values
+      int counter = 0;
+      while(counter < 10) {
+         try {
+            int[] values = channel.poll(2000, TimeUnit.MILLISECONDS);
+            //System.out.println("Values:"+Arrays.toString(values));
+         } catch (InterruptedException ex) {
+            Logger.getLogger(Tester.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Message took more than one second.");
+         }
+
+         counter++;
+      }
+
+      System.out.println("In one second, going to shutdown forcibly.");
+
+      try {
+         //carpadReader.deactivate();
+         Thread.sleep(1000);
+      } catch (InterruptedException ex) {
+         Logger.getLogger(Tester.class.getName()).log(Level.SEVERE, null, ex);
+         Thread.currentThread().interrupt();
+      }
+
+      exec.shutdownNow();
+      try {
+         exec.awaitTermination(1000, TimeUnit.MILLISECONDS);
+      } catch (InterruptedException ex) {
+         Logger.getLogger(Tester.class.getName()).log(Level.SEVERE, null, ex);
+         Thread.currentThread().interrupt();
+      }
+      carpadReader.deactivate();
    }
 
 
