@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Logger;
+import pt.amaze.ASL.TimeUtils;
 import pt.amaze.ASLCandidates.RxtxUtils;
 
 /**
@@ -104,7 +105,7 @@ public class CarpadUtils {
     * @return true if it could connect to the port and could find the pattern of
     * Carpad. False otherwise.
     */
-   static boolean testCarpadPort(String portName) {
+   public static boolean testCarpadPort(String portName) {
       // Connect to the serial port
       SerialPort serialPort = RxtxUtils.openSerialPort(portName, "Testing port "+portName);
 
@@ -145,36 +146,39 @@ public class CarpadUtils {
     * @param inputStream
     * @return
     */
-
    private static boolean testInputStream(InputStream inputStream) throws IOException {
-
-      /*
       // Get the first data from the inputStream
       int readInt = inputStream.read();
 
-      boolean isCommandStart = readInt == CarpadSetup.PREAMBLE;
+      boolean isPreamble = readInt == CarpadSetup.PREAMBLE;
       long initialNanos = System.nanoTime();
 
-      // Read stream until a number signaling CommandStart appears
-      while (!isCommandStart) {
+      // Read stream until the preamble appears, or until a timeout. If there
+      // is a timeout, return false immediately.
+      while (!isPreamble) {
          // Test if there is a timeout
          long elapsedTime = System.nanoTime() - initialNanos;
-         long timeout = TimeUtils.millisToNanos(INPUTSTREAM_TIMEOUT_MILLIS);
+         long timeout = TimeUtils.millisToNanos(INPUTSTREAM_TEST_TIMEOUT_MILLIS);
          if (elapsedTime > timeout) {
             return false;
          }
 
          // Read again
          readInt = inputStream.read();
-         isCommandStart = readInt == CarpadInput.COMMAND_START;
+         isPreamble = readInt == CarpadSetup.PREAMBLE;
 
       }
 
       // Check for the following pattern:
       // 255 ([number] [number] ...){number of inputs} 255 ...
 
+      //TODO: Is this part necessary? Didn't we already find a 255 in the
+      // last block of code?
+
       // Search for a 255 inside an interval of numbers
-      int period = CarpadInput.NUMBER_OF_INPUTS;
+      int period = CarpadSetup.INPUTS.length;
+      /*
+      
       int periodCounter = 0;
       while(readInt != 255) {
          readInt = inputStream.read();
@@ -185,6 +189,7 @@ public class CarpadUtils {
             return false;
          }
       }
+       */
 
       // Found a 255. Check if the next X numbers are not 255, and then appears
       // a 255 again
@@ -202,8 +207,12 @@ public class CarpadUtils {
       } else {
          return false;
       }
-       */
-
-      return false;
    }
+
+   /**
+    * INSTANCE VARIABLES
+    */
+   // Timeout of the inputstream test: how much time it will spend making reads
+   // until the preamble appears.
+   private static final long INPUTSTREAM_TEST_TIMEOUT_MILLIS = 1000;
 }

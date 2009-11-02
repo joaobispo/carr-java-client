@@ -22,6 +22,7 @@ import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -106,5 +107,33 @@ public class RxtxUtils {
 
       return portList;
    }
+
+   /**
+    * Tests for the presence of RxTx dynamic libraries.
+    * Currently, test only supports Windows.
+    *
+    * @return true, if it can find the libraries for the corresponding operating
+    * system. If an unsupported operating system is detected, returns true.
+    */
+    public static boolean rxtxLibrariesExists() {
+       Logger logger = Logger.getLogger(RxtxUtils.class.getName());
+
+       String os = System.getProperty("os.name");
+        String lowerOs = os.toLowerCase();
+
+        if(lowerOs.startsWith("windows")) {
+            // Check for DLLs
+            File rxtxSerial = new File("rxtxSerial.dll");
+            if(!rxtxSerial.exists()) {
+               logger.warning("Could not find file rxtxSerial.dll.");
+                return false;
+            }
+        } else {
+            logger.info("Test for RxTx libraries not supported on operating system '"+os+"'.");
+            return true;
+        }
+
+        return true;
+    }
 
 }

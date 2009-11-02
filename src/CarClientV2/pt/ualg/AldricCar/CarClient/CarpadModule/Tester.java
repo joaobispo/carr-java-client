@@ -21,6 +21,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import pt.amaze.ASL.LoggingUtils;
+import pt.amaze.ASLCandidates.RxtxUtils;
 
 /**
  *
@@ -32,10 +34,28 @@ public class Tester {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        testLoopWithoutExceptions();
-        testLoopWithException();
+       init();
+
+        //testLoopWithoutExceptions();
+        //testLoopWithException();
+       testCarpadUtils();
     }
 
+
+   private static void init() {
+      // Logging
+       LoggingUtils.setupConsoleOnly();
+       pt.amaze.ASLCandidates.LoggingUtils.redirectSystemOut();
+       pt.amaze.ASLCandidates.LoggingUtils.redirectSystemErr();
+
+       boolean librariesExist = RxtxUtils.rxtxLibrariesExists();
+
+       if(!librariesExist) {
+          Logger.getLogger(Tester.class.getName()).
+                  warning("Libraries not found. Exiting...");
+          System.exit(1);
+       }
+   }
     
    private static void testLoopWithoutExceptions() {
       Runnable runnable = new Runnable() {
@@ -121,5 +141,22 @@ public class Tester {
 
       carpadExec.shutdownNow();
    }
+
+   private static void testCarpadUtils() {
+      /**
+       * Test finding carpad port
+       */
+
+      //String carpadPortName = CarpadUtils.findCarpadPortName();
+      //System.out.println("CarpadPortName: "+carpadPortName);
+
+      /**
+       * Test detecting carpad
+       */
+      String carpadPortName = "COM4";
+      boolean detected = CarpadUtils.testCarpadPort(carpadPortName);
+      System.out.println(detected);
+   }
+
 
 }
