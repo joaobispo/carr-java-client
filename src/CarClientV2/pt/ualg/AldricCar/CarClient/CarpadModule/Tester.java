@@ -24,8 +24,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import pt.amaze.ASL.LoggingUtils;
+import pt.amaze.ASL.TimeUtils;
 import pt.amaze.ASLCandidates.Concurrent.ReadChannel;
 import pt.amaze.ASLCandidates.RxtxUtils;
+import pt.amaze.ASLCandidates.Time.GlobalTimer;
 
 /**
  *
@@ -164,7 +166,8 @@ public class Tester {
    }
 
    private static void testCarpadReader() {
-      String portName = CarpadUtils.findCarpadPortName();
+      String portName = "COM4";
+      //String portName = CarpadUtils.findCarpadPortName();
       
       if(portName == null) {
          System.out.println("Could not find port.");
@@ -173,7 +176,11 @@ public class Tester {
 
       CarpadReader carpadReader = new CarpadReader();
       ReadChannel<int[]> channel = carpadReader.getReadChannel();
-      carpadReader.activate(portName);
+      boolean activated = carpadReader.activate(portName);
+      if(!activated) {
+         System.out.println("Could not connect. Exiting...");
+         System.exit(1);
+      }
       //carpadReader.activate("COM4");
       
       ExecutorService exec = Executors.newSingleThreadExecutor();
@@ -184,9 +191,14 @@ public class Tester {
       int counter = 0;
       while(counter < 100 && !exec.isTerminated()) {
          try {
+            GlobalTimer.startTimer();
             // First read needs more time.
             int[] values = channel.poll(2000, TimeUnit.MILLISECONDS);
-            System.out.println("Values:"+Arrays.toString(values));
+            GlobalTimer.stopTimer();
+            System.out.println("Time in Millis:"+TimeUtils.nanosToMillis(GlobalTimer.getIimeIntervalNanos()));
+            
+
+            //System.out.println("Values:"+Arrays.toString(values));
          } catch (InterruptedException ex) {
             Logger.getLogger(Tester.class.getName()).log(Level.SEVERE, null, ex);
          }

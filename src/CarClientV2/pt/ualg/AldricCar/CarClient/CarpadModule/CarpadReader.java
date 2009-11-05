@@ -20,8 +20,6 @@ package pt.ualg.AldricCar.CarClient.CarpadModule;
 import gnu.io.SerialPort;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import pt.amaze.ASLCandidates.Concurrent.ReadChannel;
 import pt.amaze.ASLCandidates.Concurrent.WriteChannel;
@@ -237,7 +235,7 @@ public class CarpadReader implements Runnable {
     */
    private static int[] readValues(InputStream inputStream, Logger logger) throws IOException {
       // Number of inputs
-      final int numInputs = CarpadSetup.INPUTS.length;
+      final int numInputs = CarpadSetup.NUM_INPUTS;
 
       // Create return array
       final int[] values = new int[numInputs];
@@ -270,7 +268,7 @@ public class CarpadReader implements Runnable {
     */
    private static void putInputStreamInPhase(InputStream inputStream, Logger logger) throws IOException {
       // Number of inputs
-      final int numInputs = CarpadSetup.INPUTS.length;
+      final int numInputs = CarpadSetup.NUM_INPUTS;
 
       // It is not in phase. Read up to a maximum of the number of inputs,
       // until preable value appears.

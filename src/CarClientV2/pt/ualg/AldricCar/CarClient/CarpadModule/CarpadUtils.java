@@ -174,7 +174,7 @@ public class CarpadUtils {
       // Preamble ([number] [number] ...){number of inputs} Preamble ...
       // In other words, check if the next X numbers are not 255, and then appears
       // a 255 again
-      int period = CarpadSetup.INPUTS.length;
+      final int period = CarpadSetup.NUM_INPUTS;
       for(int i=0; i<period; i++) {
          readInt = inputStream.read();
          if(readInt == 255) {
