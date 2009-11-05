@@ -32,14 +32,27 @@ public interface CarpadSetup {
    /**
     * Enum listing the inputs of the Carpad
     */
-   enum Input {
-      ANALOG1,
-      ANALOG2,
-      ANALOG3,
-      ANALOG4,
-      WHEEL,
-      TRIGGER;
+   public enum Input {
+      ANALOG1(0),
+      ANALOG2(1),
+      ANALOG3(2),
+      ANALOG4(3),
+      WHEEL(4),
+      TRIGGER(5);
 
+      private Input(int index) {
+         this.index = index;
+      }
+
+
+      public int getIndex() {
+         return index;
+      }
+
+      /**
+       * INSTANCE VARIABLES
+       */
+      private final int index;
    };
 
    /**
