@@ -15,36 +15,28 @@
  *  under the License.
  */
 
-package pt.ualg.AldricCar.CarClient.CarpadModule;
+package pt.ualg.AldricCar.CarClient.CommandModule;
+
+import java.util.EnumMap;
+import pt.ualg.AldricCar.CarClient.CommandModule.CommandSetup.Variable;
 
 /**
- * Contains information about the Carpad, such as the value of the preamble
- * and which variables it sends.
- *
+ * Straightforward, unoptimized implementation of Command.
+ * 
  * @author Joao Bispo
  */
-public interface CarpadSetup {
-   /**
-    * The value of the preamble.
-    */
-    int PREAMBLE = 255;
+public class CommandImplementation implements Command {
+
+   public CommandImplementation(EnumMap<Variable, Integer> values) {
+      this.values = values;
+   }
 
    /**
-    * Enum listing the inputs of the Carpad
+    * INSTANCE VARIABLES
     */
-   enum Input {
-      ANALOG1,
-      ANALOG2,
-      ANALOG3,
-      ANALOG4,
-      WHEEL,
-      TRIGGER;
+   private final EnumMap<CommandSetup.Variable, Integer> values;
 
-   };
-
-   /**
-    * The number of inputs of Carpad.
-    */
-   static int NUM_INPUTS = Input.values().length;
-
+   public int getValue(Variable var) {
+      return values.get(var);
+   }
 }

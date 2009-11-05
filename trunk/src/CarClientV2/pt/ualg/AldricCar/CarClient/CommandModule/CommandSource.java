@@ -43,7 +43,7 @@ public interface CommandSource {
    
    /**
     *  If connected, disconnects the CommandSource so it stops sending commands,
-    *  and frees all resources it requested when connected.
+    *  and frees all resources it requested when connecting.
     * <br> If object is not connected, nothing happens.
     */
    void disconnect();
@@ -73,7 +73,16 @@ public interface CommandSource {
     * or CommandSource is not connected, returns a special Command with
     * invalid status.
     *
-    * @return a Command object.
+    * @return a Command object, if data is avaliable. If there is no data
+    * available when the request is made, the method may block for a while,
+    * waiting until there is a Command object available, but it must never
+    * block indefinitely.
+    *
+    * <p>If the method couldn’t read a Command object (e.g.: time out), null is
+    * returned.
+    *
+    * <p>If CommandSource is not connected when this method is called, null is
+    * returned.
     */
    Command readCommand();
 

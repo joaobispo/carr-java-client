@@ -18,42 +18,21 @@
 package pt.ualg.AldricCar.CarClient.CommandModule;
 
 /**
- * Enum representing the variables inside the command.
+ * Contains information about a Command object. .
  * 
  * @author Joao Bispo
  */
-public enum CommandArrayVariable {
+public interface CommandSetup {
 
-   COUNTER(0),
-   ANALOG1(1),
-   ANALOG2(2),
-   ANALOG3(3),
-   ANALOG4(4),
-   WHEEL(5),
-   TRIGGER(6);
-
-   private CommandArrayVariable(int index) {
-      this.index = index;
+   enum Variable {
+      COUNTER,
+      WHEEL,
+      TRIGGER,
+      PAN,
+      TILT,
+      FLAGS_ONE;
    }
 
-   /**
-    * @return the index associated with the variable.
-    */
-   public int getIndex() {
-      return index;
-   }
-
-   /**
-    * @return the number of variables of a Command array
-    */
-   static int getArraySize() {
-      return arraySize;
-   }
-
-
-   /**
-    * INSTANCE VARIABLE
-    */
-   private final int index;
-   private static final int arraySize = CommandArrayVariable.values().length;
+   int NUM_INPUTS = Variable.values().length;
+   
 }
