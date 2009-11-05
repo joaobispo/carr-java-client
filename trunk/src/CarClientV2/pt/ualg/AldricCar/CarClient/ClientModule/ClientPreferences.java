@@ -17,7 +17,9 @@
 
 package pt.ualg.AldricCar.CarClient.ClientModule;
 
+import java.util.Properties;
 import pt.amaze.ASLCandidates.Interfaces.EnumKey;
+import pt.amaze.ASLCandidates.IoUtils;
 import pt.amaze.ASLCandidates.Preferences.PreferencesEnum;
 
 /**
@@ -26,16 +28,18 @@ import pt.amaze.ASLCandidates.Preferences.PreferencesEnum;
  *
  * @author Joao Bispo
  */
-public enum CorePreferences implements EnumKey {
+public enum ClientPreferences implements EnumKey {
 
-   SerialPortName("COM4");
+   SerialPortName("COM4"),
+   ServerAddress("127.0.0l1"),
+   FirstReadTimeoutMillis("5000");
 
    /**
     * Enum Constructor
     * 
     * @param defaultValue
     */
-   private CorePreferences(String defaultValue) {
+   private ClientPreferences(String defaultValue) {
       this.defaultValue = defaultValue;
    }
 
@@ -58,10 +62,35 @@ public enum CorePreferences implements EnumKey {
       return preferences;
    }
 
+
+   /**
+    * Initiallizes the Preferences object:
+    *    - Asks for the Preferences associated with this package;
+    *    - Looks for a Properties file and if found, loads and stores its
+    *  definitions.
+    *
+    * @return a PreferencesEnum initialized for the ClientModule package.
+    */
+   private static PreferencesEnum initializePreferences() {
+      // Ask for Preferences
+      PreferencesEnum newPreferences = new PreferencesEnum(ClientPreferences.class, true);
+
+      // Find Properties file
+      Properties properties = IoUtils.loadProperties(CLIENT_PROPERTIES_FILENAME);
+      // Load properties
+      if(properties != null) {
+         newPreferences.loadProperties(properties);
+      }
+
+      return newPreferences;
+   }
+
    /**
     * INSTANCE VARIABLES
     */
-   private static final PreferencesEnum preferences =
-           new PreferencesEnum(CorePreferences.class, true);
+   private static final PreferencesEnum preferences = initializePreferences();
+
    private final String defaultValue;
+
+   private static final String CLIENT_PROPERTIES_FILENAME = "client.properties";
 }

@@ -17,6 +17,7 @@
 
 package pt.ualg.AldricCar.CarClient.CommunicationsModule;
 
+import pt.amaze.ASLCandidates.Identification.ByteIdentifier;
 import pt.amaze.ASLCandidates.Identification.IntIdentifier;
 
 /**
@@ -63,15 +64,10 @@ public interface CommandSource {
     * @return the period at which CommandSource generates Command objects when
     * connected, in milliseconds.
     */
-   long commandPeriod();
+   long getCommandPeriod();
 
    /**
     * Reads a Command object from the CommandSource.
-    *
-    * <p>If there is no Command object available, the method blocks until there
-    * is a Command object available, or until it times out.  If it times out,
-    * or CommandSource is not connected, returns a special Command with
-    * invalid status.
     *
     * @return a Command object, if data is avaliable. If there is no data
     * available when the request is made, the method may block for a while,
@@ -104,11 +100,11 @@ public interface CommandSource {
     * Sets the IntIdentifier of this CommandSource, needed to generate unique
     * Command objects.
     */
-   void setIntIdentifier();
+   void setByteIdentifier(ByteIdentifier byteIdentifier);
    
    /**
     * @return the IntIdentifier of this CommandSource.
     */
-   IntIdentifier getIntIdentifier();
+   ByteIdentifier getByteIdentifier();
 
 }

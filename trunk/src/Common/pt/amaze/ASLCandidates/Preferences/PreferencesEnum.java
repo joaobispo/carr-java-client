@@ -17,6 +17,9 @@
 
 package pt.amaze.ASLCandidates.Preferences;
 
+import java.util.Properties;
+import java.util.Set;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import pt.amaze.ASLCandidates.Interfaces.EnumKey;
 
@@ -72,6 +75,33 @@ public class PreferencesEnum {
     */
    public void putPreference(EnumKey key, String value) {
       preferences.put(key.getKey(), value);
+   }
+
+   /**
+    * Loads the contents of the Properties object and saves the in the
+    * Preferences.
+    *
+    * @param properties the properties object to import the values from.
+    */
+   public void loadProperties(Properties properties) {
+      Set<String> keys = properties.stringPropertyNames();
+
+      // Add properties to preferences
+      for(String key : keys) {
+         String value = properties.getProperty(key);
+         preferences.put(key, value);
+      }
+
+      /*
+      if(keys.size() > 0) {
+         Logger.getLogger(PreferencesEnum.class.getName()).
+                 info("Added "+keys.size()+" entries to the Preferences.");
+
+      } else {
+         Logger.getLogger(PreferencesEnum.class.getName()).
+                 info("Properties file was empty.");
+      }
+       */
    }
 
    

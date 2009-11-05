@@ -17,6 +17,10 @@
 
 package pt.ualg.AldricCar.CarClient;
 
+import java.util.logging.Logger;
+import pt.amaze.ASL.LoggingUtils;
+import pt.amaze.ASLCandidates.RxtxUtils;
+
 /**
  *
  * @author Joao Bispo
@@ -28,9 +32,44 @@ public class Main {
      */
     public static void main(String[] args) {
 
-        System.out.println("HELLO!");
-
+        //System.out.println("HELLO!");
 
     }
 
+    /**
+     * Method which tests the 1-byte counter, to see if it is possible to use it.
+     */
+    private static void counterTest() {
+
+
+        byte byteone = Byte.MAX_VALUE;
+        byte bytetwo = (byte) (byteone + 1);
+
+        int intone = byteone;
+        int inttwo = bytetwo;
+
+        System.out.println("ByteTwo:"+bytetwo);
+        System.out.println("ByteTwo - ByteOne:"+(byte)(bytetwo-byteone));
+        System.out.println("IntTwo - IntOne:"+(inttwo-intone));
+        System.out.println("IntTwo - IIntOnentOne (casting):"+(byte)(inttwo-intone));
+    }
+
+    /**
+     * Standard initiallization for the program
+     */
+    public static void init() {
+      // Logging
+       LoggingUtils.setupConsoleOnly();
+       pt.amaze.ASLCandidates.LoggingUtils.redirectSystemOut();
+       pt.amaze.ASLCandidates.LoggingUtils.redirectSystemErr();
+
+       // Check if libraries exists
+       boolean librariesExist = RxtxUtils.rxtxLibrariesExists();
+
+       if(!librariesExist) {
+          Logger.getLogger(Main.class.getName()).
+                  warning("Libraries not found. Exiting...");
+          System.exit(1);
+       }
+   }
 }

@@ -18,25 +18,33 @@
 package pt.ualg.AldricCar.CarClient.CommunicationsModule;
 
 import java.util.EnumMap;
-import pt.ualg.AldricCar.CarClient.CommunicationsModule.CommandSetup.Variable;
 
 /**
- * Straightforward, unoptimized implementation of Command.
+ * Straightforward, simple implementation of Command.
  * 
  * @author Joao Bispo
  */
 public class CommandImplementation implements Command {
 
-   public CommandImplementation(EnumMap<Variable, Integer> values) {
+   public CommandImplementation(EnumMap<Command.Variable, Integer> values) {
       this.values = values;
    }
+
+
+   public int getValue(Command.Variable variable) {
+      return values.get(variable);
+   }
+
+   @Override
+   public String toString() {
+      return values.toString();
+   }
+
+
 
    /**
     * INSTANCE VARIABLES
     */
-   private final EnumMap<CommandSetup.Variable, Integer> values;
+   private final EnumMap<Command.Variable, Integer> values;
 
-   public int getValue(Variable var) {
-      return values.get(var);
-   }
 }

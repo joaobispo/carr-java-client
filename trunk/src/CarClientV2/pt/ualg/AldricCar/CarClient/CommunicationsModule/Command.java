@@ -30,6 +30,23 @@ public interface Command {
     * @return the value to which the specified CommandSetup.Variable is mapped,
     * or null if this map contains no mapping for the CommandSetup.Variable.
     */
-   int getValue(CommandSetup.Variable var);
+   int getValue(Command.Variable variable);
 
+   /**
+    * List of the variables of the Command object
+    */
+   enum Variable {
+
+      COUNTER,
+      WHEEL,
+      TRIGGER,
+      PAN,
+      TILT,
+      FLAGS_FIRST_SET,
+      FLAGS_SECOND_SET;
+   }
+   /**
+    * The number of variables of Command
+    */
+   int NUM_INPUTS = Variable.values().length;
 }
