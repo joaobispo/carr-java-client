@@ -37,7 +37,8 @@ public class Tester {
       Main.init();
 
       //testPreferences();
-      testCarpadCommandSource();
+      //testCarpadCommandSource();
+      testPreferencesAndProperties();
    }
 
    private static void testPreferences() {
@@ -127,6 +128,16 @@ public class Tester {
       }
 
       System.out.println("Test Ended");
+   }
+
+   private static void testPreferencesAndProperties() {
+      ClientProperties clientProp = new ClientProperties();
+      PreferencesEnum prefEnum = new PreferencesEnum(ClientPreferences.class, true, clientProp);
+
+      System.out.println("Contains 'string':"+clientProp.containsName("string"));
+      System.out.println("Contains enum:"+clientProp.containsName(ClientPreferences.FirstReadTimeoutMillis.getKey()));
+
+      
    }
 
 }

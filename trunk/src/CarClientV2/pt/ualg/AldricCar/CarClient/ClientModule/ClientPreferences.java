@@ -31,7 +31,8 @@ import pt.amaze.ASLCandidates.Preferences.PreferencesEnum;
 public enum ClientPreferences implements EnumKey {
 
    SerialPortName("COM4"),
-   ServerAddress("127.0.0l1"),
+   ServerAddress("127.0.0.1"),
+   ServerPort("7890"),
    FirstReadTimeoutMillis("5000");
 
    /**
@@ -92,5 +93,6 @@ public enum ClientPreferences implements EnumKey {
 
    private final String defaultValue;
 
+   // TODO: Remove
    private static final String CLIENT_PROPERTIES_FILENAME = "client.properties";
 }
