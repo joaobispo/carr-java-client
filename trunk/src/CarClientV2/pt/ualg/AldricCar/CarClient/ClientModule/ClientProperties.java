@@ -37,7 +37,7 @@ public class ClientProperties implements PropertiesDefinition {
 
    private List<Section> buildSections() {
       String[] comments;
-      String propertieName;
+      EnumKey property;
       List<Section> newSections = new ArrayList<Section>(ClientPreferences.values().length);
 
       // Section 1
@@ -46,32 +46,61 @@ public class ClientProperties implements PropertiesDefinition {
                  "Properties file for Aldric's Car Client",
                  "#",
                  "",
-                 "",
                  "#",
                  "# Server",
                  "#",
                  "",
                  " Server Address"
               };
-      propertieName = ClientPreferences.ServerAddress.getKey();
-      addSection(newSections, comments, propertieName);
+      property = ClientPreferences.ServerAddress;
+      addSection(newSections, comments, property);
+
+      // Section 2
+      comments = new String[]{
+                 "",
+                 " Server Port"
+              };
+      property = ClientPreferences.ServerPort;
+      addSection(newSections, comments, property);
+
+      // Section 3
+      comments = new String[]{
+                 "",
+                 "",
+                 "#",
+                 " Carpad Controller",
+                 "#",
+                 "",
+                 " Carpad Timeout For the First Message in Milliseconds"
+              };
+      property = ClientPreferences.FirstReadTimeoutMillis;
+      addSection(newSections, comments, property);
+
+      // Section 4
+      comments = new String[]{
+                 "",
+                 " Carpad Controller Serial Port Name"
+              };
+      property = ClientPreferences.SerialPortName;
+      addSection(newSections, comments, property);
 
       return newSections;
    }
 
 
-   private void addSection(List<Section> newSections, String[] comments, String propertieName) {
-      Section section = new Section(comments, null)
-      throw new UnsupportedOperationException("Not yet implemented");
+   private void addSection(List<Section> newSections, String[] comments, EnumKey propertyName) {
+      Section section = new Section(comments, propertyName);
+      newSections.add(section);
    }
 
-   public boolean containsName(String keyName) {
+   public EnumKey valueOf(String keyName) {
+      EnumKey parameter;
       try {
-         ClientPreferences.valueOf(keyName);
+         parameter = ClientPreferences.valueOf(keyName);
       } catch (IllegalArgumentException ex) {
-         return false;
+         parameter = null;
       }
-      return true;
+      return parameter;
    }
 
 
