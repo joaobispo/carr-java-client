@@ -43,7 +43,14 @@ public class PreferencesEnum {
     * @param local
     */
    public PreferencesEnum(Class<?> c, boolean local) {
-      this(c, local, null);
+      if(local) {
+         preferences = Preferences.userNodeForPackage(c);
+      } else {
+         preferences = Preferences.systemNodeForPackage(c);
+      }
+
+      this.propertiesDef = null;
+      //initializeProperties(propertiesDef);
    }
 
    /**
@@ -55,6 +62,7 @@ public class PreferencesEnum {
     * @param local controls if class should fetch a SystemNode or a LocalNode.
     * @param propertiesDef Backs up the Preferences with a Properties file.
     */
+   /*
    public PreferencesEnum(Class<?> c, boolean local, PropertiesDefinition propertiesDef) {
       if(local) {
          preferences = Preferences.userNodeForPackage(c);
@@ -63,43 +71,108 @@ public class PreferencesEnum {
       }
 
       this.propertiesDef = propertiesDef;
+      initializeProperties(propertiesDef);
+   }
+    */
 
+   /**
+    * If Properties file exists, loads the contents into the Preferences. Else,
+    * a new Properties file is created.
+    * 
+    * @param propertiesDef
+    */
+   /*
+   private void initializeProperties(PropertiesDefinition propertiesDef) {
+      if(propertiesDef == null) {
+         return;
+      }
+
+      // Properties filename
+      String propertiesFilename = propertiesDef.getPropertiesFilename();
+
+      // Load properties
+      Properties properties = IoUtils.loadProperties(propertiesFilename);
+
+      // Check if the Properties file exists
+      if (properties == null) {
+         Logger.getLogger(PreferencesEnum.class.getName()).
+                 info("Properties file doesn't exist. Creating a new one...");
+         PreferencesUtil.savePropertiesDefinition(this);
+      } else {
+         // Load properties values into preferences
+         PreferencesUtil.loadPropertiesDefinition(this);
+         Logger.getLogger(PreferencesEnum.class.getName()).
+                 info("Loaded values from file '" + propertiesDef.getPropertiesFilename() + "'.");
+      }
+   }
+    */
+
+   /**
+    * Adds a PropertiesDefinition to the Preferences, so preferences are 
+    * backed up by a properties file, along the mechanism for Preferences. 
+    * After assigning a PropertiesDefinition, they influence Perferences in the 
+    * following way:
+    * 
+    *<p> - Right after being added, values from the properties file are loaded into
+    * the preferences; if properties file doesn’t exist, it is created with the 
+    * current values of preferences.
+    * 
+    *<p> - Changes in Preferences are reflected on the fields of the properties 
+    * file.
+    * 
+    * @param properties
+    */
+   public void addProperties(PropertiesDefinition propertiesDefinition) {
+      if(propertiesDefinition == null) {
+          Logger.getLogger(PreferencesEnum.class.getName()).
+                 warning("null PropertiesDefinition.");
+          return;
+      }
+
+      // Check if there wasn't already a PropertiesDefinition associated with
+      // PreferencesEnum
       if(propertiesDef != null) {
-         initializeProperties(propertiesDef);
+         String oldFile = propertiesDef.getPropertiesFilename();
+         String newFile = propertiesDefinition.getPropertiesFilename();
+         Logger.getLogger(PreferencesEnum.class.getName()).
+                 warning("PreferencesEnum already associated with file '"+oldFile+"'. " +
+                 "Associating with new file '"+newFile+"'");
+      }
+
+      propertiesDef = propertiesDefinition;
+
+      // Properties filename
+      String propertiesFilename = propertiesDefinition.getPropertiesFilename();
+      File propertiesFile = new File(propertiesFilename);
+      // Load properties
+      //Properties properties = IoUtils.loadProperties(propertiesFilename);
+
+      // Check if the Properties file exists
+      if (!propertiesFile.isFile()) {
+         Logger.getLogger(PreferencesEnum.class.getName()).
+                 info("Properties file '"+propertiesFilename+"' doesn't exist. Creating a new one...");
+          PreferencesUtil.savePropertiesDefinition(this);
+      } else {
+         // Load properties values into preferences
+         boolean couldLoad = PreferencesUtil.loadPropertiesDefinition(this);
+         String prefix;
+         if(!couldLoad) {
+            prefix = "Couldn't load";
+         } else {
+            prefix = "Loaded";
+         }
+         
+         Logger.getLogger(PreferencesEnum.class.getName()).
+                 info(prefix + " values from file '" + propertiesDef.getPropertiesFilename() + "'.");
       }
    }
 
    /**
-    * Loads the contents of a Properties object into the Preferences.
-    * 
-    * @param propertiesDef
+    * @return the PropertiesDefinition associated to this PreferencesEnum. 
+    * If none is associated, null is returned.
     */
-   private void initializeProperties(PropertiesDefinition propertiesDef) {
-      // Properties filename
-      String propertiesFilename = propertiesDef.getPropertiesFilename();
-      // Load properties
-      Properties properties = IoUtils.loadProperties(propertiesFilename);
-      // Check if the Properties file exists
-      if(properties == null) {
-         // Create a new properties file.
-         String propertiesContents = PreferencesUtil.generateProperties(propertiesDef, preferences);
-         // Save file
-         String propFilename = propertiesDef.getPropertiesFilename();
-         File propFile = IoUtils.safeFile(propFilename);
-         IoUtils.write(propFile, propertiesContents);
-      } else {
-         // Load properties values into preferences
-         PreferencesUtil.loadPropertiesDefinition(propertiesDef, preferences);
-      }
-
-      /*
-      if(properties != null) {
-
-         newPreferences.loadProperties(properties);
-      }
-               Logger.getLogger(PreferencesEnum.class.getName()).
-                 info("Using properties file '"+propertiesDef.getPropertiesFilename()+"'.");
-       */
+   public PropertiesDefinition getPropertiesDefinition() {
+      return propertiesDef;
    }
 
    /**
@@ -125,12 +198,36 @@ public class PreferencesEnum {
 
    /**
     * Associates the specified value with the specified key in this preference node.
+    * Everytime a value if put using this method, the properties file is saved
+    * (if there is one associated).
     *
     * @param key key with which the specified value is to be associated.
     * @param value value to be associated with the specified key.
     */
    public void putPreference(EnumKey key, String value) {
+      putPreference(key, value, true);
+   }
+
+   /**
+    * Associates the specified value with the specified key in this preference node.
+    *
+    * @param key key with which the specified value is to be associated.
+    * @param value value to be associated with the specified key.
+    * @param saveProperties if true, all changes of preferences will be saved
+    * in the properties file associated.
+    */
+   public void putPreference(EnumKey key, String value, boolean saveProperties) {
       preferences.put(key.getKey(), value);
+
+      if (saveProperties) {
+         if (propertiesDef != null) {
+            /*
+            Logger.getLogger(PreferencesEnum.class.getName()).
+                    info("Saving properties file.");
+             */
+            PreferencesUtil.savePropertiesDefinition(this);
+         }
+      }
    }
 
    /**
@@ -139,6 +236,7 @@ public class PreferencesEnum {
     *
     * @param properties the properties object to import the values from.
     */
+   /*
    public void loadProperties(Properties properties) {
       Set<String> keys = properties.stringPropertyNames();
 
@@ -149,7 +247,7 @@ public class PreferencesEnum {
          //putPreference(, value);
          preferences.put(key, value);
       }
-
+*/
       /*
       if(keys.size() > 0) {
          Logger.getLogger(PreferencesEnum.class.getName()).
@@ -160,14 +258,16 @@ public class PreferencesEnum {
                  info("Properties file was empty.");
       }
        */
+   /*
    }
+    */
 
    
    /**
     * INSTANCE VARIABLES
     */
    private final Preferences preferences;
-   private final PropertiesDefinition propertiesDef;
+   private PropertiesDefinition propertiesDef;
 
 
 

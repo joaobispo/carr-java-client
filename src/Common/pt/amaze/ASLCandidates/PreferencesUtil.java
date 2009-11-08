@@ -17,8 +17,13 @@
 
 package pt.amaze.ASLCandidates;
 
+import java.io.File;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import pt.amaze.ASLCandidates.Interfaces.EnumKey;
 import pt.amaze.ASLCandidates.Interfaces.PropertiesDefinition;
 import pt.amaze.ASLCandidates.Interfaces.PropertiesDefinition.Section;
 import pt.amaze.ASLCandidates.Preferences.PreferencesEnum;
@@ -38,7 +43,10 @@ public class PreferencesUtil {
     * @param preferences
     * @return
     */
-   public static String generateProperties(PropertiesDefinition propertiesDef, Preferences preferences) {
+   public static String generateProperties(PreferencesEnum preferences) {
+      // Get Properties Definition
+      PropertiesDefinition propertiesDef = preferences.getPropertiesDefinition();
+      
       int builderCapacity = 1000;
       StringBuilder builder = new StringBuilder(builderCapacity);
 
@@ -46,21 +54,86 @@ public class PreferencesUtil {
       List<Section> sections = propertiesDef.getSections();
 
       for(Section section : sections) {
+         /*
          // For each section in Definitions, check if the key exists
+         EnumKey enumKey = section.getKey();
+         enumKey = propertiesDef.valueOf(enumKey.getKey());
+
          // If it doesn't exist, skip this value
+         if(enumKey == null) {
+            Logger.getLogger(PreferencesUtil.class.getName()).
+                    warning("");
+            continue;
+         }
+          */
+         // For each section, get the value in Preferences and add the text
+         // to the properties file
+         String value = preferences.getPreference(section.getKey());
+         String sectionContent = section.toString(value);
+         builder.append(sectionContent);
 
       }
 
-      return "";
+      return builder.toString();
    }
+
    /**
     * Loads the contents of a PropertiesDefinition into the PreferencesEnum.
     *
     * @param propertiesDef
     * @param preferences
+    * @return true if it could load the values of Properties file.
     */
-   public static void loadPropertiesDefinition(PropertiesDefinition propertiesDef, Preferences preferences) {
-    
+   public static boolean loadPropertiesDefinition(PreferencesEnum preferences) {
+      // Get the Properties object
+      PropertiesDefinition propertiesDefiniton = preferences.getPropertiesDefinition();
+      String propertiesFilename = propertiesDefiniton.getPropertiesFilename();
+      Properties properties = IoUtils.loadProperties(propertiesFilename);
+
+      if(properties == null) {
+         return false;
+      }
+
+      // Get keys
+      Set<String> propertyKeys = properties.stringPropertyNames();
+      for(String key : propertyKeys) {
+         // Check if key exists in PropertiesDefinition
+         EnumKey enumKey = propertiesDefiniton.valueOf(key);
+         if(enumKey == null) {
+            Logger.getLogger(PreferencesUtil.class.getName()).
+                    warning("Key '"+key+"' in properties '"+propertiesFilename+"' " +
+                    "doesn't exist in the program definitions.");
+         } else {
+            // Get the value
+            String value = properties.getProperty(key);
+            // Store it in the preferences
+            preferences.putPreference(enumKey, value, false);
+         }
+      }
+
+      return true;
+   }
+
+
+   /**
+    * Saves the content of the preferences to a properties file.
+    *
+    * @param propertiesDef
+    * @param preferences
+    */
+   public static void savePropertiesDefinition(PreferencesEnum preferences) {
+
+      // Create a new properties file.
+      String propertiesContents = PreferencesUtil.generateProperties(preferences);
+
+      // Save file
+      PropertiesDefinition propertiesDef = preferences.getPropertiesDefinition();
+      String propFilename = propertiesDef.getPropertiesFilename();
+      File propFile = IoUtils.safeFile(propFilename);
+      if (propFile != null) {
+         IoUtils.write(propFile, propertiesContents);
+      }
+ 
    }
 
 }

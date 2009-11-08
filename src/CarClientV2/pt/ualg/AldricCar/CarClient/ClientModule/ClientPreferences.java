@@ -17,9 +17,8 @@
 
 package pt.ualg.AldricCar.CarClient.ClientModule;
 
-import java.util.Properties;
 import pt.amaze.ASLCandidates.Interfaces.EnumKey;
-import pt.amaze.ASLCandidates.IoUtils;
+import pt.amaze.ASLCandidates.Interfaces.PropertiesDefinition;
 import pt.amaze.ASLCandidates.Preferences.PreferencesEnum;
 
 /**
@@ -60,6 +59,10 @@ public enum ClientPreferences implements EnumKey {
     * @return PreferencesEnum object associated with this program.
     */
    public static PreferencesEnum getPreferences() {
+      if(preferences == null) {
+         preferences = initializePreferences();
+      }
+
       return preferences;
    }
 
@@ -73,15 +76,20 @@ public enum ClientPreferences implements EnumKey {
     * @return a PreferencesEnum initialized for the ClientModule package.
     */
    private static PreferencesEnum initializePreferences() {
+      // Build Properties Definitions
+      PropertiesDefinition propsDef = new ClientProperties();
+
       // Ask for Preferences
       PreferencesEnum newPreferences = new PreferencesEnum(ClientPreferences.class, true);
 
+      /*
       // Find Properties file
       Properties properties = IoUtils.loadProperties(CLIENT_PROPERTIES_FILENAME);
       // Load properties
       if(properties != null) {
          newPreferences.loadProperties(properties);
       }
+       */
 
       return newPreferences;
    }
@@ -89,10 +97,11 @@ public enum ClientPreferences implements EnumKey {
    /**
     * INSTANCE VARIABLES
     */
-   private static final PreferencesEnum preferences = initializePreferences();
+   //private static final PreferencesEnum preferences = initializePreferences();
+   private static PreferencesEnum preferences = null;
 
    private final String defaultValue;
 
    // TODO: Remove
-   private static final String CLIENT_PROPERTIES_FILENAME = "client.properties";
+   //private static final String CLIENT_PROPERTIES_FILENAME = "client.properties";
 }

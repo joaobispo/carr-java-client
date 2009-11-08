@@ -42,21 +42,16 @@ public interface PropertiesDefinition {
 
 
    /**
-    * Checks if the given name is part of the EnumKey this class is supporting.
+    * Returns the enum constant of this type with the specified name.
+    * The string must match exactly an identifier used to declare an enum
+    * constant in this type.
+    * (Extraneous whitespace characters are not permitted.)
     *
     * @param keyName
-    * @return true if String corresponds to a valid key name of the EnumKey
-    * that is being backed-up.
+    * @return the enum constant with the specified name, or null if the enum
+    * couldn't be found.
     */
-   boolean containsName(String keyName);
-
-   /**
-    * Returns the line in the Properties file where the given property appears.
-    *
-    * @param keyName
-    * @return
-    */
-   int propertyLine(String keyName);
+   EnumKey valueOf(String keyName);
 
    /**
     * Class which stores a String[] and a EnumKey. The String[] represents
@@ -76,6 +71,52 @@ public interface PropertiesDefinition {
       public EnumKey getKey() {
          return key;
       }
+
+      /**
+       * Returns the text of the properties file for this section
+       *
+       * @param value
+       * @return
+       */
+      public String toString(String value) {
+         String commentPrefix = "#";
+         String lineSeparator = System.getProperty("line.separator");
+         String propertySeparator = " = ";
+
+         int capacity = 200;
+         StringBuilder builder = new StringBuilder(capacity);
+
+         // Process comments
+         for(String comment : comments) {
+            // If empty, put an empty line
+            if(comment.length() == 0) {
+               builder.append(lineSeparator);
+            } else {
+            // Otherwise, put the line with a comment prefix
+               builder.append(commentPrefix);
+               builder.append(comment);
+               builder.append(lineSeparator);
+            }
+         }
+
+         // Process propertie
+         builder.append(key.getKey());
+         builder.append(propertySeparator);
+         builder.append(value);
+         builder.append(lineSeparator);
+
+         return builder.toString();
+      }
+
+      /**
+       * @return the text of the properties file for this section, using
+       * default values.
+       */
+      @Override
+      public String toString() {
+         return toString(key.getDefaultValue());
+      }
+
 
 
       /**
