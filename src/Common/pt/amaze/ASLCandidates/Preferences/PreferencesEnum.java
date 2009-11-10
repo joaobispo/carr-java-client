@@ -18,13 +18,9 @@
 package pt.amaze.ASLCandidates.Preferences;
 
 import java.io.File;
-import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import pt.amaze.ASLCandidates.Interfaces.EnumKey;
-import pt.amaze.ASLCandidates.Interfaces.PropertiesDefinition;
-import pt.amaze.ASLCandidates.IoUtils;
 import pt.amaze.ASLCandidates.PreferencesUtil;
 
 /**
@@ -50,6 +46,7 @@ public class PreferencesEnum {
       }
 
       this.propertiesDef = null;
+      hasProperties = false;
       //initializeProperties(propertiesDef);
    }
 
@@ -117,7 +114,8 @@ public class PreferencesEnum {
     * the preferences; if properties file doesn’t exist, it is created with the 
     * current values of preferences.
     * 
-    *<p> - Changes in Preferences are reflected on the fields of the properties 
+    *<p> - If autosave is enabled in the PropertiesDefinition, changes in
+    * Preferences are immediately reflected on the fields of the properties
     * file.
     * 
     * @param properties
@@ -131,7 +129,8 @@ public class PreferencesEnum {
 
       // Check if there wasn't already a PropertiesDefinition associated with
       // PreferencesEnum
-      if(propertiesDef != null) {
+      if(hasProperties) {
+      //if(propertiesDef != null) {
          String oldFile = propertiesDef.getPropertiesFilename();
          String newFile = propertiesDefinition.getPropertiesFilename();
          Logger.getLogger(PreferencesEnum.class.getName()).
@@ -140,6 +139,7 @@ public class PreferencesEnum {
       }
 
       propertiesDef = propertiesDefinition;
+      hasProperties = true;
 
       // Properties filename
       String propertiesFilename = propertiesDefinition.getPropertiesFilename();
@@ -198,14 +198,23 @@ public class PreferencesEnum {
 
    /**
     * Associates the specified value with the specified key in this preference node.
-    * Everytime a value if put using this method, the properties file is saved
-    * (if there is one associated).
+    *
+    * <p>If there is a PropertiesDefinition associated with this PreferenceEnum,
+    * and the PropertiesDefinition has AutoSave enabled, everytime a value if
+    * put using this method, the properties file is saved
     *
     * @param key key with which the specified value is to be associated.
     * @param value value to be associated with the specified key.
     */
    public void putPreference(EnumKey key, String value) {
-      putPreference(key, value, true);
+      //putPreference(key, value, true);
+      preferences.put(key.getKey(), value);
+
+      if(hasProperties) {
+         if(propertiesDef.isAutoSaveEnabled()) {
+            PreferencesUtil.savePropertiesDefinition(this);
+         }
+      }
    }
 
    /**
@@ -216,18 +225,38 @@ public class PreferencesEnum {
     * @param saveProperties if true, all changes of preferences will be saved
     * in the properties file associated.
     */
+   /*
    public void putPreference(EnumKey key, String value, boolean saveProperties) {
       preferences.put(key.getKey(), value);
 
+
       if (saveProperties) {
          if (propertiesDef != null) {
-            /*
-            Logger.getLogger(PreferencesEnum.class.getName()).
-                    info("Saving properties file.");
-             */
+            
+           // Logger.getLogger(PreferencesEnum.class.getName()).
+           //         info("Saving properties file.");
+             
             PreferencesUtil.savePropertiesDefinition(this);
          }
       }
+   }
+   */
+
+
+   /**
+    * If a PropertiesDefinition is associated with PreferencesEnum, updates the
+    * properties file with the current values.
+    *
+    * @return true if the file could be successfully written.
+    */
+   public boolean saveProperties() {
+      if (!hasProperties) {
+         Logger.getLogger(PreferencesEnum.class.getName()).
+                 info("There is no PropertiesDefinition class associated! Can't save properties.");
+         return false;
+      }
+
+      return PreferencesUtil.savePropertiesDefinition(this);
    }
 
    /**
@@ -268,6 +297,7 @@ public class PreferencesEnum {
     */
    private final Preferences preferences;
    private PropertiesDefinition propertiesDef;
+   private boolean hasProperties;
 
 
 

@@ -19,7 +19,7 @@ package pt.ualg.AldricCar.CarClient.ClientModule;
 
 import java.util.prefs.Preferences;
 import pt.amaze.ASLCandidates.Identification.ByteIdentifier;
-import pt.amaze.ASLCandidates.Interfaces.PropertiesDefinition.Section;
+import pt.amaze.ASLCandidates.Preferences.PropertiesDefinition.Section;
 import pt.amaze.ASLCandidates.Preferences.PreferencesEnum;
 import pt.amaze.ASLCandidates.PreferencesUtil;
 import pt.ualg.AldricCar.CarClient.CarpadModule.CarpadUtils;
@@ -134,9 +134,8 @@ public class Tester {
    }
 
    private static void testPreferencesAndProperties() {
-      ClientProperties clientProp = new ClientProperties();
       PreferencesEnum prefEnum = ClientPreferences.getPreferences();
-      prefEnum.addProperties(clientProp);
+
       //PreferencesEnum prefEnum = new PreferencesEnum(ClientPreferences.class, true, clientProp);
 
       //System.out.println("Contains 'string':"+clientProp.valueOf("String"));

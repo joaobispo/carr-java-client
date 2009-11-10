@@ -330,8 +330,8 @@ public class IoUtils {
      * @param file File object representing an existing file.
      * @param contents The contents to write.
      */
-    public static void write(File file, String contents) {
-        write(file, contents, false);
+    public static boolean write(File file, String contents) {
+        return write(file, contents, false);
     }
 
 
@@ -345,9 +345,11 @@ public class IoUtils {
      *
      * @param file File object representing an existing file.
      * @param contents The contents to write.
+     *
+     * @return true if the file could be written.
      */
-    public static void append(File file, String contents) {
-        write(file, contents, true);
+    public static boolean append(File file, String contents) {
+        return write(file, contents, true);
     }
 
     /**
@@ -363,45 +365,50 @@ public class IoUtils {
      * @param contents The contents to write.
      * @param append if true, then bytes will be written to the end of the
      * file rather than the beginning.
+     *
+     * @return true if the file could be written.
      */
-    private static void write(File file, String contents, boolean append) {
-        // Check if path exists
-        final boolean fileExists = file.exists();
-        if (!fileExists) {
-            console.warning("path \"" + file.getAbsolutePath() + "\" " +
-                    "doesn't " + "exist.");
-            return;
-        }
+   private static boolean write(File file, String contents, boolean append) {
+      // Check if path exists
+      final boolean fileExists = file.exists();
+      if (!fileExists) {
+         console.warning("path \"" + file.getAbsolutePath() + "\" " +
+                 "doesn't " + "exist.");
+         return false;
+      }
 
-        // Path exists. Check if path is a file
-        final boolean isFileValid = file.isFile();
-        if (!isFileValid) {
-            console.warning("path \"" + file.getAbsolutePath() + "\" " +
-                    "exists, but isn't a file.");
-            return;
-        }
+      // Path exists. Check if path is a file
+      final boolean isFileValid = file.isFile();
+      if (!isFileValid) {
+         console.warning("path \"" + file.getAbsolutePath() + "\" " +
+                 "exists, but isn't a file.");
+         return false;
+      }
 
-         FileOutputStream stream = null;
-         OutputStreamWriter streamWriter = null;
-        // File exists. Try to write it
-        try {
-            stream = new FileOutputStream(file, append);
-            streamWriter = new OutputStreamWriter(stream, charSet);
-            final BufferedWriter writer = new BufferedWriter(streamWriter);
-            writer.write(contents, 0, contents.length());
-            writer.close();
-            // Inform about the operation
-            if(append) {
-               console.info("File appended ("+file.getAbsolutePath()+").");
-            } else {
-                console.info("File written ("+file.getAbsolutePath()+").");
-            }
+      FileOutputStream stream = null;
+      OutputStreamWriter streamWriter = null;
+      // File exists. Try to write it
+      try {
+         stream = new FileOutputStream(file, append);
+         streamWriter = new OutputStreamWriter(stream, charSet);
+         final BufferedWriter writer = new BufferedWriter(streamWriter);
+         writer.write(contents, 0, contents.length());
+         writer.close();
+         // Inform about the operation
+         if (append) {
+            console.info("File appended (" + file.getAbsolutePath() + ").");
+         } else {
+            console.info("File written (" + file.getAbsolutePath() + ").");
+         }
 
-        } catch (IOException ex) {
-            console.severe("IOException while trying to use the " +
-                        "writers (" + file.getAbsolutePath() + ")");
-        }
-    }
+      } catch (IOException ex) {
+         console.severe("IOException while trying to use the " +
+                 "writers (" + file.getAbsolutePath() + ")");
+         return false;
+      }
+
+      return true;
+   }
 
 
     /**

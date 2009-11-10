@@ -18,7 +18,7 @@
 package pt.ualg.AldricCar.CarClient.ClientModule;
 
 import pt.amaze.ASLCandidates.Interfaces.EnumKey;
-import pt.amaze.ASLCandidates.Interfaces.PropertiesDefinition;
+import pt.amaze.ASLCandidates.Preferences.PropertiesDefinition;
 import pt.amaze.ASLCandidates.Preferences.PreferencesEnum;
 
 /**
@@ -55,7 +55,6 @@ public enum ClientPreferences implements EnumKey {
    }
 
    /**
-    * 
     * @return PreferencesEnum object associated with this program.
     */
    public static PreferencesEnum getPreferences() {
@@ -81,6 +80,7 @@ public enum ClientPreferences implements EnumKey {
 
       // Ask for Preferences
       PreferencesEnum newPreferences = new PreferencesEnum(ClientPreferences.class, true);
+      newPreferences.addProperties(propsDef);
 
       /*
       // Find Properties file
