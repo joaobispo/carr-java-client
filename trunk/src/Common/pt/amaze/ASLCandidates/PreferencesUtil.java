@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 import pt.amaze.ASLCandidates.Interfaces.EnumKey;
 import pt.amaze.ASLCandidates.Preferences.PropertiesDefinition;
 import pt.amaze.ASLCandidates.Preferences.PropertiesDefinition.Section;
@@ -54,21 +53,10 @@ public class PreferencesUtil {
       List<Section> sections = propertiesDef.getSections();
 
       for(Section section : sections) {
-         /*
-         // For each section in Definitions, check if the key exists
-         EnumKey enumKey = section.getKey();
-         enumKey = propertiesDef.valueOf(enumKey.getKey());
-
-         // If it doesn't exist, skip this value
-         if(enumKey == null) {
-            Logger.getLogger(PreferencesUtil.class.getName()).
-                    warning("");
-            continue;
-         }
-          */
          // For each section, check if there is a key
          EnumKey key = section.getKey();
          String sectionContent;
+
          if(key == null) {
             // If there is no key, just print the text
             sectionContent = section.toString();
@@ -79,13 +67,6 @@ public class PreferencesUtil {
          }
 
          builder.append(sectionContent);
-         /*
-         //get the value in Preferences and add the text
-         // to the properties file
-         String value = preferences.getPreference(section.getKey());
-         String sectionContent = section.toString(value);
-         builder.append(sectionContent);
-         */
       }
 
       return builder.toString();
@@ -107,7 +88,6 @@ public class PreferencesUtil {
       if(properties == null) {
          return false;
       }
-
 
       // Before storing values, save autosave state
       boolean autosaveState = propertiesDefiniton.isAutoSaveEnabled();
@@ -159,7 +139,6 @@ public class PreferencesUtil {
       } else {
          return false;
       }
- 
    }
 
 }

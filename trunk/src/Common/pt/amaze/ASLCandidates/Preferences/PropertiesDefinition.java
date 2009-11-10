@@ -168,10 +168,6 @@ public abstract class PropertiesDefinition {
        * @return
        */
       public String toString(String value) {
-         //String commentPrefix = "#";
-         //String lineSeparator = System.getProperty("line.separator");
-         //String propertySeparator = " = ";
-
          int capacity = 200;
          StringBuilder builder = new StringBuilder(capacity);
 
@@ -209,10 +205,8 @@ public abstract class PropertiesDefinition {
          }
          else {
             return toString(key.getDefaultValue());
-         }
-         
+         }        
       }
-
 
 
       /**

@@ -29,64 +29,25 @@ public class ClientProperties extends PropertiesDefinition {
 
    public ClientProperties() {
       super(ClientPreferences.values().length);
-      /*
-      if(sections == null) {
-         sections = buildSections();
-      }
-       */
    }
 
    protected void buildSections() {
-      //String[] comments;
-      //EnumKey property;
-      //List<Section> newSections = new ArrayList<Section>(ClientPreferences.values().length);
-
+      
       // Initial Header
       addSection("#");
       addSection("Properties file for Aldric's Car Client");
       addSection("#");
       addSection("");
-      /*
-      comments = new String[]{
-                 "#",
-                 "Properties file for Aldric's Car Client",
-                 "#",
-                 "",
-                 "#",
-                 "# Server",
-                 "#",
-      };
-      property = null;
-      addSection(newSections, comments, property);
-       */
 
       // Server Part
       addSection("#");
-      addSection("# Server");
+      addSection(" Server");
       addSection("#");
       addSection("");
       addSection(" Server Address", ClientPreferences.ServerAddress);
       addSection("");
       addSection(" Server Port", ClientPreferences.ServerPort);
-      /*
-      comments = new String[]{           
-                 "",
-                 " Server Address"
-              };
-      property = ClientPreferences.ServerAddress;
-      addSection(newSections, comments, property);
-       */
-
-      // Section 2
-      /*
-      comments = new String[]{
-                 "",
-                 " Server Port"
-              };
-      property = ClientPreferences.ServerPort;
-      addSection(newSections, comments, property);
-       */
-
+     
       // CarpadController Part
       addSection("");
       addSection("");
@@ -97,37 +58,9 @@ public class ClientProperties extends PropertiesDefinition {
       addSection(" Carpad Timeout For the First Message in Milliseconds", ClientPreferences.FirstReadTimeoutMillis);
       addSection("");
       addSection(" Carpad Controller Serial Port Name", ClientPreferences.SerialPortName);
-      /*
-      comments = new String[]{
-                 "",
-                 "",
-                 "#",
-                 " Carpad Controller",
-                 "#",
-                 "",
-                 " Carpad Timeout For the First Message in Milliseconds"
-              };
-      property = ClientPreferences.FirstReadTimeoutMillis;
-      addSection(newSections, comments, property);
-
-      // Section 4
-      comments = new String[]{
-                 "",
-                 " Carpad Controller Serial Port Name"
-              };
-      property = ClientPreferences.SerialPortName;
-      addSection(newSections, comments, property);
-*/
-      //return newSections;
+     
    }
 
-
-   /*
-   private void addSection(List<Section> newSections, String[] comments, EnumKey propertyName) {
-      Section section = new Section(comments, propertyName);
-      newSections.add(section);
-   }
-    */
 
    public EnumKey valueOf(String keyName) {
       EnumKey parameter;
@@ -140,12 +73,6 @@ public class ClientProperties extends PropertiesDefinition {
    }
 
 
-   /*
-   public List<Section> getSections() {
-      return sections;
-   }
-    */
-
    public String getPropertiesFilename() {
       return CLIENT_PROPERTIES_FILENAME;
    }
@@ -153,8 +80,6 @@ public class ClientProperties extends PropertiesDefinition {
    /**
     * INSTANCE VARIABLES
     */
-   //private static List<Section> sections = null;
    private static final String CLIENT_PROPERTIES_FILENAME = "client.properties";
-
 
 }
