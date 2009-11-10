@@ -78,18 +78,9 @@ public enum ClientPreferences implements EnumKey {
       // Build Properties Definitions
       PropertiesDefinition propsDef = new ClientProperties();
 
-      // Ask for Preferences
+      // Build Preferences
       PreferencesEnum newPreferences = new PreferencesEnum(ClientPreferences.class, true);
       newPreferences.addProperties(propsDef);
-
-      /*
-      // Find Properties file
-      Properties properties = IoUtils.loadProperties(CLIENT_PROPERTIES_FILENAME);
-      // Load properties
-      if(properties != null) {
-         newPreferences.loadProperties(properties);
-      }
-       */
 
       return newPreferences;
    }
@@ -97,11 +88,7 @@ public enum ClientPreferences implements EnumKey {
    /**
     * INSTANCE VARIABLES
     */
-   //private static final PreferencesEnum preferences = initializePreferences();
    private static PreferencesEnum preferences = null;
-
    private final String defaultValue;
 
-   // TODO: Remove
-   //private static final String CLIENT_PROPERTIES_FILENAME = "client.properties";
 }
