@@ -153,6 +153,8 @@ public class CarpadCommandSource implements CommandSource {
    public Command readCommand() {
       // If not running, return null
       if(!isConnected()) {
+         Logger.getLogger(CarpadCommandSource.class.getName()).
+                 warning("Is not connected.");
          return null;
       }
 
@@ -175,6 +177,7 @@ public class CarpadCommandSource implements CommandSource {
       }
 
       if(values == null) {
+         System.out.println("Timeout while reading from channel. Current timeout: '"+timeout+"' millis.");
          return null;
       }
 

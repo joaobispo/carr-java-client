@@ -64,7 +64,7 @@ public class CarpadReader implements Runnable {
     * If in NOT_ACTIVE state, attempts a connection to the given <tt>portName</tt>.
     * If a connection is possible, object is put in ACTIVE state.
     *
-    * <p> Before connecting, the method tests if the given <tt>portName</tt>
+    * <p> The method doesn't test if the given <tt>portName</tt>
     * gives a correct stream of inputs.
     *
     * <p> After the object is ACTIVE, it can only go back to NOT_ACTIVE if it is
@@ -84,16 +84,19 @@ public class CarpadReader implements Runnable {
       }
 
       // Test port
-      boolean isPortGood = CarpadUtils.testCarpadPort(portName);
+      //boolean isPortGood = CarpadUtils.testCarpadPort(portName);
 
-      if(!isPortGood) {
-         return false;
-      }
+      //if(!isPortGood)
+      //{
+      //   logger.warning("Test of the Carpad port returned false.");
+      //   return false;
+      //}
 
       // Make connection
       serialPort = RxtxUtils.openSerialPort(portName, "CarPad Controller at '"+portName+"'.");
 
       if(serialPort == null) {
+         logger.warning("Couldn't open Serial Port.");
          return false;
       }
 
@@ -269,6 +272,8 @@ public class CarpadReader implements Runnable {
    private static void putInputStreamInPhase(InputStream inputStream, Logger logger) throws IOException {
       // Number of inputs
       final int numInputs = CarpadSetup.NUM_INPUTS;
+      // Slack
+      final int slack = CarpadSetup.INPUTSTREAM_SLACK;
 
       // It is not in phase. Read up to a maximum of the number of inputs,
       // until preable value appears.
