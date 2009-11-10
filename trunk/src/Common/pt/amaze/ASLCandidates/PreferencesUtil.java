@@ -24,8 +24,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import pt.amaze.ASLCandidates.Interfaces.EnumKey;
-import pt.amaze.ASLCandidates.Interfaces.PropertiesDefinition;
-import pt.amaze.ASLCandidates.Interfaces.PropertiesDefinition.Section;
+import pt.amaze.ASLCandidates.Preferences.PropertiesDefinition;
+import pt.amaze.ASLCandidates.Preferences.PropertiesDefinition.Section;
 import pt.amaze.ASLCandidates.Preferences.PreferencesEnum;
 
 /**
@@ -66,12 +66,26 @@ public class PreferencesUtil {
             continue;
          }
           */
-         // For each section, get the value in Preferences and add the text
+         // For each section, check if there is a key
+         EnumKey key = section.getKey();
+         String sectionContent;
+         if(key == null) {
+            // If there is no key, just print the text
+            sectionContent = section.toString();
+         } else {
+            // If there is a key, get the value in Preferences
+            String value = preferences.getPreference(section.getKey());
+            sectionContent = section.toString(value);
+         }
+
+         builder.append(sectionContent);
+         /*
+         //get the value in Preferences and add the text
          // to the properties file
          String value = preferences.getPreference(section.getKey());
          String sectionContent = section.toString(value);
          builder.append(sectionContent);
-
+         */
       }
 
       return builder.toString();
@@ -94,6 +108,12 @@ public class PreferencesUtil {
          return false;
       }
 
+
+      // Before storing values, save autosave state
+      boolean autosaveState = propertiesDefiniton.isAutoSaveEnabled();
+      // Disable autosave
+      propertiesDefiniton.setAutoSave(false);
+
       // Get keys
       Set<String> propertyKeys = properties.stringPropertyNames();
       for(String key : propertyKeys) {
@@ -107,9 +127,12 @@ public class PreferencesUtil {
             // Get the value
             String value = properties.getProperty(key);
             // Store it in the preferences
-            preferences.putPreference(enumKey, value, false);
+            preferences.putPreference(enumKey, value);
          }
       }
+
+      // Restore autosave state
+      propertiesDefiniton.setAutoSave(autosaveState);
 
       return true;
    }
@@ -121,7 +144,7 @@ public class PreferencesUtil {
     * @param propertiesDef
     * @param preferences
     */
-   public static void savePropertiesDefinition(PreferencesEnum preferences) {
+   public static boolean savePropertiesDefinition(PreferencesEnum preferences) {
 
       // Create a new properties file.
       String propertiesContents = PreferencesUtil.generateProperties(preferences);
@@ -130,8 +153,11 @@ public class PreferencesUtil {
       PropertiesDefinition propertiesDef = preferences.getPropertiesDefinition();
       String propFilename = propertiesDef.getPropertiesFilename();
       File propFile = IoUtils.safeFile(propFilename);
+
       if (propFile != null) {
-         IoUtils.write(propFile, propertiesContents);
+         return IoUtils.write(propFile, propertiesContents);
+      } else {
+         return false;
       }
  
    }

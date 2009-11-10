@@ -17,30 +17,36 @@
 
 package pt.ualg.AldricCar.CarClient.ClientModule;
 
-import java.util.ArrayList;
-import java.util.List;
 import pt.amaze.ASLCandidates.Interfaces.EnumKey;
-import pt.amaze.ASLCandidates.Interfaces.PropertiesDefinition;
+import pt.amaze.ASLCandidates.Preferences.PropertiesDefinition;
 
 /**
  * Contains information about the Client’s Properties file.
  *
  * @author Joao Bispo
  */
-public class ClientProperties implements PropertiesDefinition {
+public class ClientProperties extends PropertiesDefinition {
 
    public ClientProperties() {
+      super(ClientPreferences.values().length);
+      /*
       if(sections == null) {
          sections = buildSections();
       }
+       */
    }
 
-   private List<Section> buildSections() {
-      String[] comments;
-      EnumKey property;
-      List<Section> newSections = new ArrayList<Section>(ClientPreferences.values().length);
+   protected void buildSections() {
+      //String[] comments;
+      //EnumKey property;
+      //List<Section> newSections = new ArrayList<Section>(ClientPreferences.values().length);
 
-      // Section 1
+      // Initial Header
+      addSection("#");
+      addSection("Properties file for Aldric's Car Client");
+      addSection("#");
+      addSection("");
+      /*
       comments = new String[]{
                  "#",
                  "Properties file for Aldric's Car Client",
@@ -49,21 +55,49 @@ public class ClientProperties implements PropertiesDefinition {
                  "#",
                  "# Server",
                  "#",
+      };
+      property = null;
+      addSection(newSections, comments, property);
+       */
+
+      // Server Part
+      addSection("#");
+      addSection("# Server");
+      addSection("#");
+      addSection("");
+      addSection(" Server Address", ClientPreferences.ServerAddress);
+      addSection("");
+      addSection(" Server Port", ClientPreferences.ServerPort);
+      /*
+      comments = new String[]{           
                  "",
                  " Server Address"
               };
       property = ClientPreferences.ServerAddress;
       addSection(newSections, comments, property);
+       */
 
       // Section 2
+      /*
       comments = new String[]{
                  "",
                  " Server Port"
               };
       property = ClientPreferences.ServerPort;
       addSection(newSections, comments, property);
+       */
 
-      // Section 3
+      // CarpadController Part
+      addSection("");
+      addSection("");
+      addSection("#");
+      addSection(" Carpad Controller");
+      addSection("#");
+      addSection("");
+      addSection(" Carpad Timeout For the First Message in Milliseconds", ClientPreferences.FirstReadTimeoutMillis);
+      addSection("");
+      addSection(" Carpad Controller Serial Port Name", ClientPreferences.SerialPortName);
+      /*
       comments = new String[]{
                  "",
                  "",
@@ -83,15 +117,17 @@ public class ClientProperties implements PropertiesDefinition {
               };
       property = ClientPreferences.SerialPortName;
       addSection(newSections, comments, property);
-
-      return newSections;
+*/
+      //return newSections;
    }
 
 
+   /*
    private void addSection(List<Section> newSections, String[] comments, EnumKey propertyName) {
       Section section = new Section(comments, propertyName);
       newSections.add(section);
    }
+    */
 
    public EnumKey valueOf(String keyName) {
       EnumKey parameter;
@@ -104,9 +140,11 @@ public class ClientProperties implements PropertiesDefinition {
    }
 
 
+   /*
    public List<Section> getSections() {
       return sections;
    }
+    */
 
    public String getPropertiesFilename() {
       return CLIENT_PROPERTIES_FILENAME;
@@ -115,7 +153,7 @@ public class ClientProperties implements PropertiesDefinition {
    /**
     * INSTANCE VARIABLES
     */
-   private static List<Section> sections = null;
+   //private static List<Section> sections = null;
    private static final String CLIENT_PROPERTIES_FILENAME = "client.properties";
 
 
