@@ -29,6 +29,11 @@ public interface CarpadSetup {
     */
     int PREAMBLE = 255;
 
+    /**
+     * How many additional bytes the command can send between commands.
+     */
+    int INPUTSTREAM_SLACK = 4;
+
    /**
     * Enum listing the inputs of the Carpad
     */

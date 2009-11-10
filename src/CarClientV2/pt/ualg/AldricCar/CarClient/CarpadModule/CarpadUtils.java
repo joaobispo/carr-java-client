@@ -110,6 +110,8 @@ public class CarpadUtils {
       SerialPort serialPort = RxtxUtils.openSerialPort(portName, "Testing port "+portName);
 
       if(serialPort == null) {
+         Logger.getLogger(CarpadUtils.class.getName()).
+                 warning("Couldn't open Serial Port");
          return false;
       }
 
@@ -118,7 +120,8 @@ public class CarpadUtils {
 
       try {
          // Listen to the port to see if the output is the expected
-         InputStream inputStream = new BufferedInputStream(serialPort.getInputStream());
+         InputStream inputStream = serialPort.getInputStream();
+         //InputStream inputStream = new BufferedInputStream(serialPort.getInputStream());
 
          boolean isCarPad = testInputStream(inputStream);
 
@@ -126,6 +129,11 @@ public class CarpadUtils {
          inputStream.close();
          serialPort.close();
          serialPort = null;
+
+         if (!isCarPad) {
+            Logger.getLogger(CarpadUtils.class.getName()).
+                    warning("Test of the Inputstream returned false.");
+         }
 
          return isCarPad;
 
@@ -149,6 +157,7 @@ public class CarpadUtils {
    private static boolean testInputStream(InputStream inputStream) throws IOException {
       // Get the first data from the inputStream
       int readInt = inputStream.read();
+      //System.out.println("(1)Inputstream:"+readInt);
 
       boolean isPreamble = readInt == CarpadSetup.PREAMBLE;
       long initialNanos = System.nanoTime();
@@ -160,35 +169,47 @@ public class CarpadUtils {
          long elapsedTime = System.nanoTime() - initialNanos;
          long timeout = TimeUtils.millisToNanos(INPUTSTREAM_TEST_TIMEOUT_MILLIS);
          if (elapsedTime > timeout) {
+            Logger.getLogger(CarpadUtils.class.getName()).
+                    warning("Inputstream Test timeout. Couldn't find preamble ("+CarpadSetup.PREAMBLE+").");
             return false;
          }
 
          // Read again
          readInt = inputStream.read();
          isPreamble = readInt == CarpadSetup.PREAMBLE;
+         //System.out.println("(2)Inputstream:"+readInt);
 
       }
 
       
       // Found the Preamble. Check for the following pattern:
-      // Preamble ([number] [number] ...){number of inputs} Preamble ...
+      // Preamble ([number] [number] ...){number of inputs}[number]{0-slack} Preamble ...
       // In other words, check if the next X numbers are not 255, and then appears
       // a 255 again
       final int period = CarpadSetup.NUM_INPUTS;
       for(int i=0; i<period; i++) {
          readInt = inputStream.read();
+         //System.out.println("(3)Inputstream:"+readInt);
          if(readInt == 255) {
+            Logger.getLogger(CarpadUtils.class.getName()).
+                    warning("Inputstream Test failed. Found a preamble ("+CarpadSetup.PREAMBLE+") where it should be a command value.");
             return false;
          }
       }
 
       // Final check: if the next readInt is 255, we found a CarPad.
-      readInt = inputStream.read();
-      if(readInt == 255) {
-         return true;
-      } else {
-         return false;
+      for(int i=0; i<CarpadSetup.INPUTSTREAM_SLACK; i++) {
+         readInt = inputStream.read();
+         //System.out.println("(4)Inputstream:"+readInt);
+         if (readInt == 255) {
+            return true;
+         }
       }
+
+      Logger.getLogger(CarpadUtils.class.getName()).
+                    warning("Inputstream Test failed. Couldn't find a preamble after '"+period+
+                    "' commands and '"+CarpadSetup.INPUTSTREAM_SLACK+"' bytes of slack. ");
+      return false;
    }
 
    /**

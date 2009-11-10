@@ -40,8 +40,8 @@ public class Tester {
       Main.init();
 
       //testPreferences();
-      //testCarpadCommandSource();
-      testPreferencesAndProperties();
+      testCarpadCommandSource();
+      //testPreferencesAndProperties();
    }
 
    private static void testPreferences() {
@@ -56,17 +56,22 @@ public class Tester {
       ByteIdentifier byteId = new ByteIdentifier();
       long timeout = 500;
       CommandSource csource = new CarpadCommandSource(byteId, timeout);
+      int numberOfTestReads = 10;
 
       // Is Connected?
-      System.out.println("Is Connected?:"+csource.isConnected());
+      //System.out.println("Is Connected?:"+csource.isConnected());
 
       // Try to connect
+      System.out.println("Connecting... :");
       boolean connected = csource.connect();
-      System.out.println("Connecting... :"+connected);
+      //System.out.println("Connecting... :"+connected);
+      
 
       if(!connected) {
          System.out.println("Could not connect.");
          System.exit(1);
+      } else {
+         System.out.println("Connected.");
       }
 
       // Read some values
@@ -76,8 +81,8 @@ public class Tester {
          System.out.println(csource.readCommand());
       }
        */
-
-      testDroppedPackets(csource);
+       System.out.println("Began test.");
+      testDroppedPackets(csource, numberOfTestReads);
 
       // Disconnect
       csource.disconnect();
@@ -85,11 +90,16 @@ public class Tester {
 
       // Connect again
       System.out.println("Connecting 2n time...");
-      csource.connect();
+      connected = csource.connect();
+      if(!connected) {
+         System.out.println("Could not connect the 2nd time.");
+         System.exit(1);
+      }
+
       System.out.println("Connected 2n time.");
 
       System.out.println("Test 2nd time.");
-      testDroppedPackets(csource);
+      testDroppedPackets(csource, numberOfTestReads);
 
       csource.disconnect();
       System.out.println("Disconnected 2nd time.");
@@ -99,12 +109,17 @@ public class Tester {
     * Given a running csource, tests for dropping packets
     * @param csource
     */
-   private static void testDroppedPackets(CommandSource csource) {
-      int testSize = 100;
+   private static void testDroppedPackets(CommandSource csource, int numberOfReads) {
+      int testSize = numberOfReads;
 
       Command command = null;
+      int counter = 0;
       while(command == null) {
          command = csource.readCommand();
+         counter++;
+      }
+      if(counter > 1) {
+         System.out.println("Read '"+counter+"' null commands before starting test.");
       }
 
       byte lastReadValue = (byte) command.getValue(Command.Variable.COUNTER);
@@ -128,6 +143,8 @@ public class Tester {
          }
 
          lastReadValue = newByte;
+
+         //System.out.println(command);
       }
 
       System.out.println("Test Ended");
