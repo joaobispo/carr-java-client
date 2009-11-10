@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import pt.amaze.ASLCandidates.Concurrent.ReadChannel;
 import pt.amaze.ASLCandidates.Identification.ByteIdentifier;
+import pt.amaze.ASLCandidates.ParseUtils;
 import pt.amaze.ASLCandidates.Preferences.PreferencesEnum;
 import pt.ualg.AldricCar.CarClient.CarpadModule.CarpadReader;
 import pt.ualg.AldricCar.CarClient.CarpadModule.CarpadSetup;
@@ -48,8 +49,9 @@ public class CarpadCommandSource implements CommandSource {
       isCarpadRunning = false;
       firstRead = true;
 
-      // TODO: Use library ASL for parsing, which catches exceptions
-      firstReadTimeoutMillis = Long.parseLong(preferences.getPreference(ClientPreferences.FirstReadTimeoutMillis));
+      // Read First Read Timeout from Preferences
+      String longString = preferences.getPreference(ClientPreferences.FirstReadTimeoutMillis);
+      firstReadTimeoutMillis = ParseUtils.parseLong(longString);
    }
 
 
