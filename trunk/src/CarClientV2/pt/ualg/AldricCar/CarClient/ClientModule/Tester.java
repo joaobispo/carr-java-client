@@ -17,15 +17,19 @@
 
 package pt.ualg.AldricCar.CarClient.ClientModule;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.prefs.Preferences;
 import pt.amaze.ASLCandidates.Identification.ByteIdentifier;
 import pt.amaze.ASLCandidates.Preferences.PropertiesDefinition.Section;
 import pt.amaze.ASLCandidates.Preferences.PreferencesEnum;
 import pt.amaze.ASLCandidates.PreferencesUtil;
 import pt.ualg.AldricCar.CarClient.CarpadModule.CarpadUtils;
+import pt.ualg.AldricCar.CarClient.CommandOutput;
 import pt.ualg.AldricCar.CarClient.CommunicationsModule.Command;
 import pt.ualg.AldricCar.CarClient.CommunicationsModule.CommandSource;
 import pt.ualg.AldricCar.CarClient.Main;
+import pt.ualg.AldricCar.CarClient.ServerModule.ServerExperience;
 
 /**
  *
@@ -40,8 +44,9 @@ public class Tester {
       Main.init();
 
       //testPreferences();
-      testCarpadCommandSource();
+      //testCarpadCommandSource(args);
       //testPreferencesAndProperties();
+      testClientCore();
    }
 
    private static void testPreferences() {
@@ -52,11 +57,20 @@ public class Tester {
       System.out.println("Value of ServerAddress:"+value);
    }
 
-   private static void testCarpadCommandSource() {
+   private static void testCarpadCommandSource(String args[]) {
       ByteIdentifier byteId = new ByteIdentifier();
       long timeout = 500;
       CommandSource csource = new CarpadCommandSource(byteId, timeout);
+
       int numberOfTestReads = 10;
+
+      if (args.length != 0) {
+         try {
+            int i = Integer.parseInt(args[0]);
+            numberOfTestReads = i;
+         } catch (NumberFormatException ex) {
+         }
+      }
 
       // Is Connected?
       //System.out.println("Is Connected?:"+csource.isConnected());
@@ -164,5 +178,30 @@ public class Tester {
       //prefEnum.putPreference(ClientPreferences.SerialPortName, "ttyUSB0");
       //System.out.println(prefEnum.getPreference(ClientPreferences.SerialPortName));
    }
+
+   private static void testClientCore() {
+      ClientCore clientCore = new ClientCore();
+
+      ClientListener commandOutput = new CommandOutput();
+      ClientListener clientSocket = new ClientSocket();
+
+      //clientCore.addListener(commandOutput);
+      clientCore.addListener(clientSocket);
+
+
+      // Create server and start server
+      //createAndStartServer();
+
+
+      clientCore.run();
+   }
+
+   private static void createAndStartServer() {
+      ServerExperience server = new ServerExperience();
+      ExecutorService executor = Executors.newSingleThreadExecutor();
+      executor.submit(server);
+      executor.shutdown();
+   }
+
 
 }
