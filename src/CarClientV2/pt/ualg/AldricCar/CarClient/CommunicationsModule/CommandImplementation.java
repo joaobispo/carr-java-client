@@ -41,10 +41,23 @@ public class CommandImplementation implements Command {
    }
 
 
+   public byte[] getByteArray() {
+      Variable[] variableOrder = Command.VARIABLE_ORDER;
+      int arraySize = variableOrder.length;
+      byte[] byteArray = new byte[arraySize];
+
+      // Fill array
+      for(int i=0; i<arraySize; i++) {
+         byteArray[i] = values.get(variableOrder[i]).byteValue();
+      }
+
+      return byteArray;
+   }
 
    /**
     * INSTANCE VARIABLES
     */
    private final EnumMap<Command.Variable, Integer> values;
+
 
 }

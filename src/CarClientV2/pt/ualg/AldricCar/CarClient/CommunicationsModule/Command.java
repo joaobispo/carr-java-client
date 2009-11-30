@@ -25,6 +25,12 @@ package pt.ualg.AldricCar.CarClient.CommunicationsModule;
 public interface Command {
 
    /**
+    * @return the contents of the Command over a byte array format. 
+    * Useful for sending the information over UDP.
+    */
+   byte[] getByteArray();
+
+   /**
     * 
     * @param var the CommandSetup.Variable whose associated value is to be returned
     * @return the value to which the specified CommandSetup.Variable is mapped,
@@ -48,5 +54,18 @@ public interface Command {
    /**
     * The number of variables of Command
     */
-   int NUM_INPUTS = Variable.values().length;
+   public int NUM_INPUTS = Variable.values().length;
+
+   /**
+    *  An array with the order by which the Variables are encoded in the byte array.
+    */
+   public static Variable[] VARIABLE_ORDER = {
+      Variable.COUNTER,
+      Variable.WHEEL,
+      Variable.TRIGGER,
+      Variable.PAN,
+      Variable.TILT,
+      Variable.FLAGS_FIRST_SET,
+      Variable.FLAGS_SECOND_SET
+   };
 }
